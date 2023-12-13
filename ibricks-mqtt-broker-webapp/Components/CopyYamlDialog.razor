@@ -1,0 +1,51 @@
+@using ibricks_mqtt_broker.Model
+@using ibricks_mqtt_broker.Model.DeviceState
+@inject IJSRuntime JsRuntime;
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" Label="Name" Variant="Variant.Outlined" @bind-Value="Name" />
+        
+        <MudTextField T="string" Label="YAML" Variant="Variant.Outlined" Text="@Yaml" Lines="3"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@(() => Copy())">Copy</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public string? Yaml { get; set; }
+    [Parameter] public Cello? Cello { get; set; }
+    [Parameter] public DeviceState? DeviceState { get; set; }
+
+    private string? _name;
+
+    public string? Name
+    {
+        get => _name;
+        set
+        {
+            _name = value;
+            GenerateYaml();
+        }
+    }
+
+    private void GenerateYaml()
+    {
+        if (Cello == null || DeviceState == null)
+            return;
+
+        var yaml = DeviceState.GetYaml(Cello, Name ?? string.Empty);
+        Yaml = yaml;
+    }
+
+    public async Task Copy()
+    {
+        await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", Yaml);
+        MudDialog?.Close(DialogResult.Ok(true));
+    }
+    
+    void Cancel() => MudDialog?.Cancel();
+}

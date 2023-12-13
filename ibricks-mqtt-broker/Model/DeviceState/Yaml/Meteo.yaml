@@ -1,0 +1,4 @@
+- name: "{name}"
+  state_topic: "{state_meteo}"
+  unit_of_measurement: "°C"
+  value_template: "{{ value_json.Current }}"

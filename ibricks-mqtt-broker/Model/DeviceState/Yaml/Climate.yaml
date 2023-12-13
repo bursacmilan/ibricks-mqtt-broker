@@ -1,0 +1,15 @@
+- name: "{name}"
+  temperature_unit: C
+  min_temp: 18
+  max_temp: 28
+  modes:
+     - auto
+  current_temperature_topic: "{state_meteostate}"
+  current_temperature_template: "{{ value_json.Current }}"
+  temperature_state_topic: "{state_climatestate}"
+  temperature_state_template: "{{ value_json.SetTo }}"
+  temperature_command_topic: "{command_climatestate}"
+  temperature_command_template: >
+     { "SetTo": {{value}} }
+  mode_state_topic: "{state_climatestate}"
+  mode_state_template: "{{ value_json.Mode }}"

@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>ibricks_mqtt_broker</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Ardalis.SmartEnum" Version="7.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+        <PackageReference Include="MQTTnet" Version="4.3.3.952" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Services\Cello\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Model\DeviceState\Yaml\ClimateYaml" />
+      <EmbeddedResource Include="Model\DeviceState\Yaml\Climate.yaml" />
+      <None Remove="Model\DeviceState\Yaml\Cover.yaml" />
+      <EmbeddedResource Include="Model\DeviceState\Yaml\Cover.yaml" />
+      <None Remove="Model\DeviceState\Yaml\Dimmer.yaml" />
+      <EmbeddedResource Include="Model\DeviceState\Yaml\Dimmer.yaml" />
+      <None Remove="Model\DeviceState\Yaml\Meteo.yaml" />
+      <EmbeddedResource Include="Model\DeviceState\Yaml\Meteo.yaml" />
+      <None Remove="Model\DeviceState\Yaml\Relay.yaml" />
+      <EmbeddedResource Include="Model\DeviceState\Yaml\Relay.yaml" />
+    </ItemGroup>
+
+</Project>

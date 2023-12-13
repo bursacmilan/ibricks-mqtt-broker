@@ -1,0 +1,13 @@
+- name: "{name}"
+  position_topic: "{state_cover}"
+  position_template: "{{ value_json.CurrentPosition }}"
+  set_position_topic: "{command_cover}"
+  set_position_template: >
+    { "CurrentPosition": {{value}} }
+  state_topic: "{state_cover}"
+  value_template: "{{ value_json.CurrentMovingState }}"
+  tilt_status_topic: "{state_cover}"
+  tilt_status_template: "{{ value_json.TiltPosition }}"
+  tilt_command_template: >
+    {{value}}
+  tilt_command_topic: "{command_cover}"
