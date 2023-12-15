@@ -3,9 +3,7 @@ WORKDIR /app
 COPY . .
 EXPOSE 5000
 
-RUN adduser --disabled-password \
---home /app \
---gecos '' dotnetuser && chown -R dotnetuser /app
+RUN adduser --disabled-password --home /app --gecos '' dotnetuser && chown -R dotnetuser /app
 
 USER dotnetuser
 
