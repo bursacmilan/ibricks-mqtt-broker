@@ -14,6 +14,7 @@ jobs:
       contents: read
     env:
       IMAGE_NAME: ghcr.io/bursacmilan/ibricks-mqtt-broker:latest
+      DOCKER_TARGET_PLATFORM: linux/arm64
 
     steps:
     - name: Checkout Repository
@@ -42,7 +43,7 @@ jobs:
     - name: Build docker image
       run: |
         cd publishedOutput
-        docker build . --tag ${{ env.IMAGE_NAME }}
+        docker buildx build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag ${{ env.IMAGE_NAME }}
 
     - name: Log in to registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
