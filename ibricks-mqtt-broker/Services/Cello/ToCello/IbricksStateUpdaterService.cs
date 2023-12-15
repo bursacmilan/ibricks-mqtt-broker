@@ -13,7 +13,9 @@ public class IbricksStateUpdaterService(
     IIpMacService ipMacService,
     ICelloStoreService celloStoreService,
     IUdpSenderService udpSenderService,
-    IOptionsMonitor<GlobalSettings> globalSettingsOptionsMonitor) : IIbricksStateUpdaterService
+    IOptionsMonitor<GlobalSettings> globalSettingsOptionsMonitor,
+    IMqttPublisherService mqttPublisherService,
+    IMqttSubscriberService mqttSubscriberService) : IIbricksStateUpdaterService
 {
     public async Task UpdateStateAsync(JsonNode deviceStateJson, bool isSingleValueJson, DeviceStates stateType,
         int channel, string celloMacAddress)
@@ -34,7 +36,7 @@ public class IbricksStateUpdaterService(
             nameof(DeviceStates.RelayState) => new RelayStateUpdater(logger, udpSenderService, ipMacService),
             nameof(DeviceStates.ClimateState) => new ClimateStateUpdater(logger, udpSenderService, ipMacService),
             nameof(DeviceStates.CoverState) => new CoverStateUpdater(logger, udpSenderService, ipMacService,
-                globalSettingsOptionsMonitor),
+                globalSettingsOptionsMonitor, mqttPublisherService, mqttSubscriberService),
             _ => null
         };
 

@@ -10,19 +10,32 @@ using Microsoft.Extensions.Options;
 
 namespace ibricks_mqtt_broker.Services.Cello.ToCello.DeviceSateUpdater;
 
-public class CoverStateUpdater(ILogger logger, IUdpSenderService udpSenderService, IIpMacService ipMacService, IOptionsMonitor<GlobalSettings> globalSettingsOptinsMonitor)
+public class CoverStateUpdater(
+    ILogger logger,
+    IUdpSenderService udpSenderService,
+    IIpMacService ipMacService,
+    IOptionsMonitor<GlobalSettings> globalSettingsOptinsMonitor,
+    IMqttPublisherService mqttPublisherService,
+    IMqttSubscriberService mqttSubscriberService)
     : IDeviceStateUpdater
 {
     public async Task UpdateStateAsync(JsonNode deviceStateJson, bool isSingleValueJson, Model.Cello cello, int channel)
     {
         CoverState? coverState;
+        var currentState = cello.GetCurrentState(channel, cello.CoverStates);
+        if (currentState == null)
+        {
+            logger.LogError("Could not load current state for cello {Mac}", cello.Mac);
+            return;
+        }
+
         var tiltDisabled = globalSettingsOptinsMonitor.CurrentValue.DisableTilt?.Contains(cello.Mac) ?? false;
-        
         var additionalCover = isSingleValueJson ? deviceStateJson["Additional"]?.Deserialize<string?>() : null;
+
         if (isSingleValueJson && int.TryParse(additionalCover, out var additionalCoverAsInt))
         {
             deviceStateJson[nameof(CoverState.TiltPosition)] = additionalCoverAsInt;
-            
+
             coverState = deviceStateJson.Deserialize<CoverState>(JsonSerializerOptionsDefaults.IgnoreCase);
             if (coverState != null)
                 coverState.CurrentPosition = -1;
@@ -38,6 +51,23 @@ public class CoverStateUpdater(ILogger logger, IUdpSenderService udpSenderServic
         {
             logger.LogError("Could not parse JSON {Json} to coverState", deviceStateJson.ToJsonString());
             return;
+        }
+
+        if (coverState.CurrentPosition != -1)
+        {
+            var movingState = coverState.CurrentPosition < currentState.CurrentPosition
+                ? CoverState.MovingClosing
+                : CoverState.MovingOpening;
+
+            var updatedState = cello.UpdateState(channel, cello.CoverStates, state =>
+            {
+                state.CurrentPosition = state.CurrentPosition;
+                state.CurrentMovingState = movingState;
+                state.TiltPosition = state.TiltPosition;
+            });
+
+            await mqttPublisherService.PublishMessageAsync(updatedState.GetMqttStateTopic(), JsonSerializer.Serialize(updatedState));
+            await mqttSubscriberService.SubscribeToTopicAsync(updatedState.GetMqttCommandTopic());
         }
 
         var coverMessage = new IbricksMessage

@@ -28,6 +28,17 @@ public class Cello
         return state;
     }
     
+    public T UpdateState<T>(int channel, Dictionary<int, T> states, Action<T> updateState)
+    {
+        if (states.TryGetValue(channel, out var existingState))
+        {
+            updateState(existingState);
+            return existingState;
+        }
+
+        throw new Exception($"No current state found for channel {channel} on cello {Mac}");
+    }
+    
     public T? GetCurrentState<T>(int channel, Dictionary<int, T> states)
     {
         return states.GetValueOrDefault(channel);
