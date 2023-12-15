@@ -102,7 +102,15 @@ public class MqttSubscriberService(
         jsonNode[nameof(DimmerState.Channel)] ??= channel;
         jsonNode[nameof(DimmerState.CelloMacAddress)] ??= celloMacAddress;
 
-        await ibricksStateUpdaterService.UpdateStateAsync(jsonNode, isSimplifiedJson, stateType, channel, celloMacAddress);
+        try
+        {
+            await ibricksStateUpdaterService.UpdateStateAsync(jsonNode, isSimplifiedJson, stateType, channel,
+                celloMacAddress);
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(exception, "Error while processing state");
+        }
     }
 
     private async Task SubscribeToTopicsInternalAsync(IMqttClient mqttClient)

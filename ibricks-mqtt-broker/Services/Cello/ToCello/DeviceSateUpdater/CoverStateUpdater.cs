@@ -11,7 +11,7 @@ using Microsoft.Extensions.Options;
 namespace ibricks_mqtt_broker.Services.Cello.ToCello.DeviceSateUpdater;
 
 public class CoverStateUpdater(
-    ILogger logger,
+    ILogger<CoverStateUpdater> logger,
     IUdpSenderService udpSenderService,
     IIpMacService ipMacService,
     IOptionsMonitor<GlobalSettings> globalSettingsOptinsMonitor,

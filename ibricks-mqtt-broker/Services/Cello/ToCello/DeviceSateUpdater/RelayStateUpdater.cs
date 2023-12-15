@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ibricks_mqtt_broker.Services.Cello.ToCello.DeviceSateUpdater;
 
-public class RelayStateUpdater(ILogger logger, IUdpSenderService udpSenderService, IIpMacService ipMacService) : IDeviceStateUpdater
+public class RelayStateUpdater(ILogger<RelayStateUpdater> logger, IUdpSenderService udpSenderService, IIpMacService ipMacService) : IDeviceStateUpdater
 {
     public async Task UpdateStateAsync(JsonNode deviceStateJson, bool isSingleValueJson, Model.Cello cello, int channel)
     {
