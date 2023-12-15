@@ -1,21 +1,16 @@
 using System.Text.Json.Nodes;
-using ibricks_mqtt_broker.Infrastructure;
 using ibricks_mqtt_broker.Model.DeviceState;
 using ibricks_mqtt_broker.Services.Cello.ToCello.DeviceSateUpdater;
 using ibricks_mqtt_broker.Services.Interface;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace ibricks_mqtt_broker.Services.Cello.ToCello;
 
 public class IbricksStateUpdaterService(
     ILogger<IbricksStateUpdaterService> logger,
-    IIpMacService ipMacService,
     ICelloStoreService celloStoreService,
-    IUdpSenderService udpSenderService,
-    IOptionsMonitor<GlobalSettings> globalSettingsOptionsMonitor,
-    IMqttPublisherService mqttPublisherService,
-    IMqttSubscriberService mqttSubscriberService) : IIbricksStateUpdaterService
+    IServiceProvider serviceProvider) : IIbricksStateUpdaterService
 {
     public async Task UpdateStateAsync(JsonNode deviceStateJson, bool isSingleValueJson, DeviceStates stateType,
         int channel, string celloMacAddress)
@@ -32,11 +27,10 @@ public class IbricksStateUpdaterService(
 
         IDeviceStateUpdater? stateUpdater = stateType.Name switch
         {
-            nameof(DeviceStates.DimmerState) => new DimmerStateUpdater(logger, udpSenderService, ipMacService),
-            nameof(DeviceStates.RelayState) => new RelayStateUpdater(logger, udpSenderService, ipMacService),
-            nameof(DeviceStates.ClimateState) => new ClimateStateUpdater(logger, udpSenderService, ipMacService),
-            nameof(DeviceStates.CoverState) => new CoverStateUpdater(logger, udpSenderService, ipMacService,
-                globalSettingsOptionsMonitor, mqttPublisherService, mqttSubscriberService),
+            nameof(DeviceStates.DimmerState) => serviceProvider.GetRequiredService<DimmerStateUpdater>(),
+            nameof(DeviceStates.RelayState) => serviceProvider.GetRequiredService<RelayStateUpdater>(),
+            nameof(DeviceStates.ClimateState) => serviceProvider.GetRequiredService<ClimateStateUpdater>(),
+            nameof(DeviceStates.CoverState) => serviceProvider.GetRequiredService<CoverStateUpdater>(),
             _ => null
         };
 

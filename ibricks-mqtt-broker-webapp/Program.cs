@@ -2,6 +2,7 @@ using ibricks_mqtt_broker.Infrastructure;
 using ibricks_mqtt_broker.Services;
 using ibricks_mqtt_broker.Services.Cello.FromCello;
 using ibricks_mqtt_broker.Services.Cello.ToCello;
+using ibricks_mqtt_broker.Services.Cello.ToCello.DeviceSateUpdater;
 using ibricks_mqtt_broker.Services.Interface;
 using ibricks_mqtt_broker.Services.Mqtt;
 using ibricks_mqtt_broker.Services.Mqtt.FromMqtt;
@@ -24,6 +25,8 @@ builder.Services.AddSingleton<IIbricksStateUpdaterService, IbricksStateUpdaterSe
 builder.Services.AddSingleton<IMqttPublisherService, MqttPublisherService>();
 builder.Services.AddSingleton<IMqttClientFactory, MqttClientFactory>();
 builder.Services.AddSingleton<IMqttSubscriberService, MqttSubscriberService>();
+
+builder.Services.AddStateUpdater();
 
 builder.Services.AddHostedService<UdpHostedService>();
 
