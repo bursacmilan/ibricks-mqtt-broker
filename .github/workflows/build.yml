@@ -9,6 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    env:
+      IMAGE_NAME: ghcr.io/bursacmilan/ibricks-mqtt-broker:latest
 
     steps:
     - name: Checkout Repository
@@ -30,3 +35,15 @@ jobs:
 
     - name: Dotnet publish
       run: dotnet publish ./ibricks-mqtt-broker-webapp/ibricks-mqtt-broker-webapp.csproj --configuration Release --output publishedOutput
+
+    - name: Move docker file
+      run: mv Dockerfile publishedOutput/Dockerfile
+
+    - name: Build docker image
+      run: docker build publishedOutput --tag ${{ env.IMAGE_NAME }}
+
+    - name: Log in to registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+    - name: Push image
+      run: docker push ${{ env.IMAGE_NAME }}
