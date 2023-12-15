@@ -40,13 +40,10 @@ jobs:
     - name: Move docker file
       run: mv Dockerfile publishedOutput/Dockerfile
 
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        context: publishedOutput/
-        platforms: linux/arm64
-        push: false
-        tags:  ${{ env.DOCKER_TARGET_PLATFORM }}
+    - name: Build docker image
+      run: |
+        cd publishedOutput
+        docker build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag ${{ env.IMAGE_NAME }}
 
     - name: Log in to registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
