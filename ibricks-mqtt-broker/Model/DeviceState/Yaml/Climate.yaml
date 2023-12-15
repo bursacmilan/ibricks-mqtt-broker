@@ -1,4 +1,5 @@
 - name: "{name}"
+  unique_id: "{uid}"
   temperature_unit: C
   min_temp: 18
   max_temp: 28

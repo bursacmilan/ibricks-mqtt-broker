@@ -9,7 +9,9 @@ public class MeteoState() : DeviceState(DeviceStates.MeteoState)
         var yaml = GetYaml("Meteo");
         yaml = yaml.Replace("{name}", name)
             .Replace("{state_meteo}", GetMqttStateTopic())
-            .Replace("{command_meteo}", GetMqttCommandTopic());
+            .Replace("{command_meteo}", GetMqttCommandTopic())
+            .Replace("{area}", name.Split(" ").First())
+            .Replace("{uid}", name.ToLower().Replace(" ", "-"));
 
         return yaml;
     }

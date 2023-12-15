@@ -1,4 +1,5 @@
 - name: "{name}"
+  unique_id: "{uid}"
   position_topic: "{state_cover}"
   position_template: "{{ value_json.CurrentPosition }}"
   set_position_topic: "{command_cover}"

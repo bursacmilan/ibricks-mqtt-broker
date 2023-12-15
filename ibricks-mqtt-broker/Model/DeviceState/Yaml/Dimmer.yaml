@@ -1,4 +1,5 @@
 - name: "{name}"
+  unique_id: "{uid}"
   payload_on: true
   payload_off: false
   brightness_scale: 100

@@ -10,8 +10,10 @@ public class DimmerState() : DeviceState(DeviceStates.DimmerState)
         var yaml = GetYaml("Dimmer");
         yaml = yaml.Replace("{name}", name)
             .Replace("{state_dimmer}", GetMqttStateTopic())
-            .Replace("{command_dimmer}", GetMqttCommandTopic());
-
+            .Replace("{command_dimmer}", GetMqttCommandTopic())
+            .Replace("{area}", name.Split(" ").First())
+            .Replace("{uid}", name.ToLower().Replace(" ", "-"));
+        
         return yaml;
     }
 }

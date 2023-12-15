@@ -9,7 +9,9 @@ public class RelayState() : DeviceState(DeviceStates.RelayState)
         var yaml = GetYaml("Relay");
         yaml = yaml.Replace("{name}", name)
             .Replace("{state_relay}", GetMqttStateTopic())
-            .Replace("{command_relay}", GetMqttCommandTopic());
+            .Replace("{command_relay}", GetMqttCommandTopic())
+            .Replace("{area}", name.Split(" ").First())
+            .Replace("{uid}", name.ToLower().Replace(" ", "-"));
 
         return yaml;
     }

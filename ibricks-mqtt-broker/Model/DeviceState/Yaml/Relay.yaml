@@ -1,4 +1,5 @@
 - name: "{name}"
+  unique_id: "{uid}"
   state_topic: "{state_relay}"
   command_topic: "{command_relay}"
   state_value_template: "{{ value_json.IsOn }}"

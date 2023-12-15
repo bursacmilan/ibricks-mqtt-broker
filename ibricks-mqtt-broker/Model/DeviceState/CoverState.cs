@@ -15,7 +15,9 @@ public class CoverState() : DeviceState(DeviceStates.CoverState)
         var yaml = GetYaml("Cover");
         yaml = yaml.Replace("{name}", name)
             .Replace("{state_cover}", GetMqttStateTopic())
-            .Replace("{command_cover}", GetMqttCommandTopic());
+            .Replace("{command_cover}", GetMqttCommandTopic())
+            .Replace("{area}", name.Split(" ").First())
+            .Replace("{uid}", name.ToLower().Replace(" ", "-"));
 
         return yaml;
     }
