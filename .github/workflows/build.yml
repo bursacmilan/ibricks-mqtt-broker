@@ -1,0 +1,32 @@
+name: .NET Build
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.0
+
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --configuration Release
+
+    - name: Test
+      run: dotnet test
+
+    - name: Dotnet publish
+      run: dotnet publish ./ibricks-mqtt-broker-webapp/ibricks-mqtt-broker-webapp.csproj --configuration Release --output /publishedOutput
