@@ -38,7 +38,13 @@ public class MqttSubscriberService(
         logger.LogDebug("Subscribed to topic {Topic}", topic);
     }
 
-    private async Task HandleIncomingMessageAsync(MqttApplicationMessageReceivedEventArgs e)
+    private Task HandleIncomingMessageAsync(MqttApplicationMessageReceivedEventArgs e)
+    {
+        _ = Task.Run(() => HandleIncomingMessageInternalAsync(e));
+        return Task.CompletedTask;
+    }
+
+    private async Task HandleIncomingMessageInternalAsync(MqttApplicationMessageReceivedEventArgs e)
     {
         logger.LogDebug("Handling incoming mqtt message {Message}", e.ApplicationMessage.ConvertPayloadToString());
 

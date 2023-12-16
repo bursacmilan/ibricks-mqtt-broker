@@ -40,17 +40,7 @@ public class UdpListener : IDisposable
 
                 try
                 {
-                    _logger.LogDebug("Received message from {Ip}: {Message}", ip, content);
-
-                    using var scope = _serviceProvider.CreateScope();
-                    var ibricksMessageInterpretor =
-                        scope.ServiceProvider.GetRequiredService<IIbricksMessageInterpretor>();
-                    
-                    var ibricksMessageParserService =
-                        scope.ServiceProvider.GetRequiredService<IIbricksMessageParserService>();
-                    
-                    var parsedMessage = ibricksMessageInterpretor.Interpret(content);
-                    await ibricksMessageParserService.ParseMessageAsync(parsedMessage);
+                    _ = Task.Run(() => HandleIncomingMessageAsync(content, ip));
                 }
                 catch (Exception e)
                 {
@@ -66,6 +56,21 @@ public class UdpListener : IDisposable
         {
             _udpClient.Close();
         }
+    }
+
+    private async Task HandleIncomingMessageAsync(string content, string ip)
+    {
+        _logger.LogDebug("Received message from {Ip}: {Message}", ip, content);
+
+        using var scope = _serviceProvider.CreateScope();
+        var ibricksMessageInterpretor =
+            scope.ServiceProvider.GetRequiredService<IIbricksMessageInterpretor>();
+                    
+        var ibricksMessageParserService =
+            scope.ServiceProvider.GetRequiredService<IIbricksMessageParserService>();
+                    
+        var parsedMessage = ibricksMessageInterpretor.Interpret(content);
+        await ibricksMessageParserService.ParseMessageAsync(parsedMessage);
     }
 
     private void InitUdpClient()
