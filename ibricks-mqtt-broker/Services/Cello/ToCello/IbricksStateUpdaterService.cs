@@ -18,7 +18,7 @@ public class IbricksStateUpdaterService(
         logger.LogDebug("Parsing state of type {Type} for cello with mac {Mac} and channel {Channel}", stateType,
             channel, celloMacAddress);
 
-        var cello = celloStoreService.TryGetCello(celloMacAddress);
+        var cello = await celloStoreService.TryGetCelloAsync(celloMacAddress);
         if (cello == null)
         {
             logger.LogError("Could not get cello with mac {Mac}", celloMacAddress);

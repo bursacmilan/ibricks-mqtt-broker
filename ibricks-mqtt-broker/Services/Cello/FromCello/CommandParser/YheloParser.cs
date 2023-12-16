@@ -27,7 +27,7 @@ public class YheloParser(
             message.MessageId, ip,
             message.AddressFrom, description);
 
-        celloStoreService.AddOrUpdateCello(ip, message.AddressFrom, description);
+        await celloStoreService.AddOrUpdateCelloAsync(ip, message.AddressFrom, description);
 
         var deviceStateMessage = new IbricksMessage
         {

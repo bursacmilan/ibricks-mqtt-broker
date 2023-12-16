@@ -11,7 +11,7 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="UpdateState">Copy</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@(async () => await UpdateState())">Copy</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -26,9 +26,9 @@
         MudDialog?.Cancel();
     }
 
-    private void UpdateState()
+    private async Task UpdateState()
     {
-        CelloStoreService.UpdateState(Cello, DeviceState.Channel, DeviceStates, state =>
+        await CelloStoreService.UpdateStateAsync(Cello, DeviceState.Channel, DeviceStates, state =>
         {
             state.DisplayName = DeviceState.DisplayName;
             state.UniqueId = DeviceState.UniqueId;

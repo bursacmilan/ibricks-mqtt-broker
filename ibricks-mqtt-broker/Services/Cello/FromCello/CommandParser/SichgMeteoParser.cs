@@ -23,14 +23,14 @@ public class SichgMeteoParser(ILogger logger, ICelloStoreService celloStoreServi
             return;
         }
 
-        var cello = celloStoreService.TryGetCello(message.AddressFrom);
+        var cello = await celloStoreService.TryGetCelloAsync(message.AddressFrom);
         if (cello == null)
         {
             logger.LogError("{ID}: Cello with address {Address} not found", message.MessageId, message.AddressFrom);
             return;
         }
         
-        var state = celloStoreService.AddOrUpdateState(cello, message.Channel, cello.MeteoStates, state =>
+        var state = await celloStoreService.AddOrUpdateStateAsync(cello, message.Channel, cello.MeteoStates, state =>
         {
             state.Current = v.Value;
         }, () => new MeteoState

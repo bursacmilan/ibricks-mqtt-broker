@@ -27,7 +27,7 @@ public class LrchgRelayParser(
             return;
         }
 
-        var cello = celloStoreService.TryGetCello(message.AddressFrom);
+        var cello = await celloStoreService.TryGetCelloAsync(message.AddressFrom);
         if (cello == null)
         {
             logger.LogError("{ID}: Cello with address {Address} not found", message.MessageId, message.AddressFrom);
@@ -35,7 +35,7 @@ public class LrchgRelayParser(
         }
 
         var isOn = st == 1;
-        var state = celloStoreService.AddOrUpdateState(cello, message.Channel, cello.RelayStates, state => { state.IsOn = isOn; }, () =>
+        var state = await celloStoreService.AddOrUpdateStateAsync(cello, message.Channel, cello.RelayStates, state => { state.IsOn = isOn; }, () =>
             new RelayState
             {
                 IsOn = isOn,

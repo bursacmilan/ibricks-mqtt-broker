@@ -23,7 +23,7 @@ public class CoverStateUpdater(
     public async Task UpdateStateAsync(JsonNode deviceStateJson, bool isSingleValueJson, Model.Cello cello, int channel)
     {
         CoverState? coverState;
-        var currentState = celloStoreService.GetCurrentState(cello, channel, cello.CoverStates);
+        var currentState = await celloStoreService.GetCurrentStateAsync(cello, channel, cello.CoverStates);
         if (currentState == null)
         {
             logger.LogError("Could not load current state for cello {Mac}", cello.Mac);
@@ -60,7 +60,7 @@ public class CoverStateUpdater(
                 ? CoverState.MovingClosing
                 : CoverState.MovingOpening;
 
-            var updatedState = celloStoreService.UpdateState(cello, channel, cello.CoverStates, state =>
+            var updatedState = await celloStoreService.UpdateStateAsync(cello, channel, cello.CoverStates, state =>
             {
                 state.CurrentPosition = state.CurrentPosition;
                 state.CurrentMovingState = movingState;

@@ -27,7 +27,7 @@ public class LdchgDimmerParser(
             return;
         }
 
-        var cello = celloStoreService.TryGetCello(message.AddressFrom);
+        var cello = await celloStoreService.TryGetCelloAsync(message.AddressFrom);
         if (cello == null)
         {
             logger.LogError("{ID}: Cello with address {Address} not found", message.MessageId, message.AddressFrom);
@@ -35,7 +35,7 @@ public class LdchgDimmerParser(
         }
 
         var value = (int) (v * 100);
-        var state = celloStoreService.AddOrUpdateState(cello, message.Channel, cello.DimmerStates, state =>
+        var state = await celloStoreService.AddOrUpdateStateAsync(cello, message.Channel, cello.DimmerStates, state =>
         {
             state.Value = value;
             state.IsOn = value > 0;

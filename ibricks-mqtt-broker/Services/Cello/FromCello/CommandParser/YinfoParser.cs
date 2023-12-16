@@ -6,16 +6,15 @@ namespace ibricks_mqtt_broker.Services.Cello.FromCello.CommandParser;
 
 public class YinfoParser(ILogger logger, ICelloStoreService celloStoreService) : IIbricksCommandParser
 {
-    public Task ParseAsync(IbricksMessage message)
+    public async Task ParseAsync(IbricksMessage message)
     {
         var hardwareInfo = message.GetAdditional<string>(IbricksMessageParts.V).Split("/")[0];
         var parsedHardwareInfo = ParseHardwareInfo(message, hardwareInfo);
 
-        celloStoreService.TryUpdateCello(message.AddressFrom,
+        await celloStoreService.TryUpdateCelloAsync(message.AddressFrom,
             cello => cello.HardwareInfo = parsedHardwareInfo);
 
         logger.LogDebug("{ID}: Hardware info updated to: {HInfo}", message.MessageId, hardwareInfo);
-        return Task.CompletedTask;
     }
 
     private IbricksHardwareInfo ParseHardwareInfo(IbricksMessage message, string hardwareInfo)

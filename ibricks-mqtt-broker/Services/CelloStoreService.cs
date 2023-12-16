@@ -7,7 +7,7 @@ namespace ibricks_mqtt_broker.Services;
 
 public class CelloStoreService(ILogger<CelloStoreService> logger, DatabaseContext dbContext) : ICelloStoreService
 {
-    public void AddOrUpdateCello(string ip, string mac, string description)
+    public async Task AddOrUpdateCelloAsync(string ip, string mac, string description)
     {
         var cello = new Model.Cello
         {
@@ -19,40 +19,41 @@ public class CelloStoreService(ILogger<CelloStoreService> logger, DatabaseContex
         if (dbContext.Cellos.AsNoTracking().FirstOrDefault(c => c.Mac == mac) != null)
         {
             dbContext.Update(cello);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
             return;
         }
-        
+
         dbContext.Add(cello);
-        dbContext.SaveChanges();
-    }
-    
-    public void TryUpdateCello(string mac, Action<Model.Cello> action)
-    {
-        var cello = TryGetCello(mac);
-        if (cello == null)
-            return;
-        
-        action(cello);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
     }
 
-    public Model.Cello? TryGetCello(string mac)
+    public async Task TryUpdateCelloAsync(string mac, Action<Model.Cello> action)
     {
-        var cello = dbContext.Cellos.FirstOrDefault(c => c.Mac == mac);        
-        if (cello != null) 
+        var cello = await TryGetCelloAsync(mac);
+        if (cello == null)
+            return;
+
+        action(cello);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<Model.Cello?> TryGetCelloAsync(string mac)
+    {
+        var cello = await dbContext.Cellos.FirstOrDefaultAsync(c => c.Mac == mac);
+        if (cello != null)
             return cello;
-        
+
         logger.LogError("Could not get cello with mac {mac}", mac);
         return null;
     }
 
-    public Model.Cello[] GetAllCellos()
+    public Task<Model.Cello[]> GetAllCellosAsync()
     {
-        return dbContext.Cellos.AsNoTracking().ToArray();
+        return dbContext.Cellos.AsNoTracking().ToArrayAsync();
     }
-    
-    public T AddOrUpdateState<T>(Model.Cello cello, int channel, Dictionary<int, T> states, Action<T> updateState, Func<T> newState)
+
+    public async Task<T> AddOrUpdateStateAsync<T>(Model.Cello cello, int channel, Dictionary<int, T> states,
+        Action<T> updateState, Func<T> newState)
     {
         if (states.TryGetValue(channel, out var state))
         {
@@ -65,24 +66,25 @@ public class CelloStoreService(ILogger<CelloStoreService> logger, DatabaseContex
         }
 
         dbContext.Cellos.Update(cello);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
         return state;
     }
-    
-    public T UpdateState<T>(Model.Cello cello, int channel, Dictionary<int, T> states, Action<T> updateState)
+
+    public async Task<T> UpdateStateAsync<T>(Model.Cello cello, int channel, Dictionary<int, T> states,
+        Action<T> updateState)
     {
         if (!states.TryGetValue(channel, out var existingState))
             throw new Exception($"No current state found for channel {channel} on cello {cello.Mac}");
 
         updateState(existingState);
         dbContext.Cellos.Update(cello);
-        dbContext.SaveChanges();
-        
+        await dbContext.SaveChangesAsync();
+
         return existingState;
     }
-    
-    public T? GetCurrentState<T>(Model.Cello cello, int channel, Dictionary<int, T> states)
+
+    public Task<T?> GetCurrentStateAsync<T>(Model.Cello cello, int channel, Dictionary<int, T> states)
     {
-        return states.GetValueOrDefault(channel);
+        return Task.FromResult(states.GetValueOrDefault(channel));
     }
 }

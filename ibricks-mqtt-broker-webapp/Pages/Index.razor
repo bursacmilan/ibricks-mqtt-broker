@@ -11,7 +11,7 @@
 
 <MudButtonGroup Style="margin: 20px 0 20px 0;" Color="Color.Primary" Size="Size.Large" Variant="Variant.Outlined">
     <MudButton OnClick="@(() => DiscoverClickAsync())">Discover</MudButton>
-    <MudButton OnClick="RefreshCellosClick">Refresh</MudButton>
+    <MudButton OnClick="@(async () => await RefreshCellosClick())">Refresh</MudButton>
 </MudButtonGroup>
 
 <MudTextField @bind-Value="SearchText" Label="Filter" Variant="Variant.Outlined"></MudTextField>
@@ -75,16 +75,16 @@
         }
     }
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        _cellos = CelloStoreService.GetAllCellos();
+        _cellos = await CelloStoreService.GetAllCellosAsync();
         _allCellos = _cellos;
-        return base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 
-    private void RefreshCellosClick()
+    private async Task RefreshCellosClick()
     {
-        _cellos = CelloStoreService.GetAllCellos();
+        _cellos = await CelloStoreService.GetAllCellosAsync();
         _allCellos = _cellos;
     }
 
