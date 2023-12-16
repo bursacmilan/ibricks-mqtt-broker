@@ -16,13 +16,14 @@ public class CoverStateUpdater(
     IIpMacService ipMacService,
     IOptionsMonitor<GlobalSettings> globalSettingsOptinsMonitor,
     IMqttPublisherService mqttPublisherService,
-    IMqttSubscriberService mqttSubscriberService)
+    IMqttSubscriberService mqttSubscriberService,
+    ICelloStoreService celloStoreService)
     : IDeviceStateUpdater
 {
     public async Task UpdateStateAsync(JsonNode deviceStateJson, bool isSingleValueJson, Model.Cello cello, int channel)
     {
         CoverState? coverState;
-        var currentState = cello.GetCurrentState(channel, cello.CoverStates);
+        var currentState = celloStoreService.GetCurrentState(cello, channel, cello.CoverStates);
         if (currentState == null)
         {
             logger.LogError("Could not load current state for cello {Mac}", cello.Mac);
@@ -59,7 +60,7 @@ public class CoverStateUpdater(
                 ? CoverState.MovingClosing
                 : CoverState.MovingOpening;
 
-            var updatedState = cello.UpdateState(channel, cello.CoverStates, state =>
+            var updatedState = celloStoreService.UpdateState(cello, channel, cello.CoverStates, state =>
             {
                 state.CurrentPosition = state.CurrentPosition;
                 state.CurrentMovingState = movingState;

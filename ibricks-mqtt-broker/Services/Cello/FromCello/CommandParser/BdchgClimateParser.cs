@@ -34,7 +34,7 @@ public class BdchgClimateParser(
             return;
         }
 
-        var state = cello.AddOrUpdateState(message.Channel, cello.ClimateStates, state => { state.SetTo = v.Value; },
+        var state = celloStoreService.AddOrUpdateState(cello, message.Channel, cello.ClimateStates, state => { state.SetTo = v.Value; },
             () => new ClimateState
             {
                 SetTo = v.Value,

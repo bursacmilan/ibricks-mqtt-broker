@@ -35,7 +35,7 @@ public class LrchgRelayParser(
         }
 
         var isOn = st == 1;
-        var state = cello.AddOrUpdateState(message.Channel, cello.RelayStates, state => { state.IsOn = isOn; }, () =>
+        var state = celloStoreService.AddOrUpdateState(cello, message.Channel, cello.RelayStates, state => { state.IsOn = isOn; }, () =>
             new RelayState
             {
                 IsOn = isOn,

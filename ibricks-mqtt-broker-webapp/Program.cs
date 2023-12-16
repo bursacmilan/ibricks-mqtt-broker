@@ -1,3 +1,4 @@
+using ibricks_mqtt_broker.Database;
 using ibricks_mqtt_broker.Infrastructure;
 using ibricks_mqtt_broker.Services;
 using ibricks_mqtt_broker.Services.Cello.FromCello;
@@ -16,23 +17,29 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 
-builder.Services.AddSingleton<ICelloStoreService, CelloStoreService>();
+builder.Services.AddScoped<ICelloStoreService, CelloStoreService>();
+builder.Services.AddScoped<IIbricksMessageParserService, IbricksMessageParserService>();
+builder.Services.AddScoped<IIbricksStateUpdaterService, IbricksStateUpdaterService>();
+
 builder.Services.AddSingleton<IIbricksMessageInterpretor, IbricksMessageInterpretor>();
-builder.Services.AddSingleton<IIbricksMessageParserService, IbricksMessageParserService>();
 builder.Services.AddSingleton<IIpMacService, IpMacService>();
 builder.Services.AddSingleton<IUdpSenderService, UdpSenderService>();
-builder.Services.AddSingleton<IIbricksStateUpdaterService, IbricksStateUpdaterService>();
 builder.Services.AddSingleton<IMqttPublisherService, MqttPublisherService>();
 builder.Services.AddSingleton<IMqttClientFactory, MqttClientFactory>();
 builder.Services.AddSingleton<IMqttSubscriberService, MqttSubscriberService>();
 
+builder.Services.AddDbContext<DatabaseContext>();
 builder.Services.AddStateUpdater();
-
 builder.Services.AddHostedService<UdpHostedService>();
 
 builder.Services.Configure<GlobalSettings>(builder.Configuration.GetSection("Global"));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database.EnsureCreated();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

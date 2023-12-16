@@ -1,0 +1,39 @@
+@using ibricks_mqtt_broker.Model.DeviceState
+@using ibricks_mqtt_broker.Model
+@using ibricks_mqtt_broker.Services.Interface
+@inject ICelloStoreService CelloStoreService;
+@typeparam T where T : DeviceState;
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" Label="Display name" Variant="Variant.Outlined" @bind-Value="DeviceState.DisplayName" />
+        <MudTextField T="string" Label="Unique id" Variant="Variant.Outlined" @bind-Value="DeviceState.UniqueId" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="UpdateState">Copy</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public required DeviceState DeviceState { get; set; }
+    [Parameter] public required Dictionary<int, T> DeviceStates { get; set; }
+    [Parameter] public required Cello Cello { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog?.Cancel();
+    }
+
+    private void UpdateState()
+    {
+        CelloStoreService.UpdateState(Cello, DeviceState.Channel, DeviceStates, state =>
+        {
+            state.DisplayName = DeviceState.DisplayName;
+            state.UniqueId = DeviceState.UniqueId;
+        });
+        
+        MudDialog?.Close();
+    }
+}

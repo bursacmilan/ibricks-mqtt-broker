@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using ibricks_mqtt_broker.Model.DeviceState;
 using ibricks_mqtt_broker.Services.Interface;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
@@ -10,7 +11,7 @@ namespace ibricks_mqtt_broker.Services.Mqtt.FromMqtt;
 public class MqttSubscriberService(
     ILogger<MqttSubscriberService> logger,
     IMqttClientFactory mqttClientFactory,
-    IIbricksStateUpdaterService ibricksStateUpdaterService) : IMqttSubscriberService
+    IServiceProvider serviceProvider) : IMqttSubscriberService
 {
     private IMqttClient? _mqttClient;
     private readonly List<string> _subscribedTopics = [];
@@ -104,6 +105,8 @@ public class MqttSubscriberService(
 
         try
         {
+            using var scope = serviceProvider.CreateScope();
+            var ibricksStateUpdaterService = scope.ServiceProvider.GetRequiredService<IIbricksStateUpdaterService>();
             await ibricksStateUpdaterService.UpdateStateAsync(jsonNode, isSimplifiedJson, stateType, channel,
                 celloMacAddress);
         }

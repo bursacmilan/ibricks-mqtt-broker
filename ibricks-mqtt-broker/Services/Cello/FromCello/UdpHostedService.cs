@@ -1,4 +1,3 @@
-using ibricks_mqtt_broker.Services.Interface;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -6,8 +5,7 @@ namespace ibricks_mqtt_broker.Services.Cello.FromCello;
 
 public class UdpHostedService(
     ILogger<UdpHostedService> logger,
-    IIbricksMessageParserService ibricksMessageParserService,
-    IIbricksMessageInterpretor ibricksMessageInterpretor) : IHostedService
+    IServiceProvider serviceProvider) : IHostedService
 {
     private UdpListener? _udpListener;
 
@@ -27,8 +25,7 @@ public class UdpHostedService(
     {
         while (!cancellationToken.IsCancellationRequested)
         {
-            _udpListener = new UdpListener(logger, NetworkDefaults.UdpPort, ibricksMessageParserService,
-                ibricksMessageInterpretor);
+            _udpListener = new UdpListener(logger, NetworkDefaults.UdpPort, serviceProvider);
             await _udpListener.StartListening();
         }
     }

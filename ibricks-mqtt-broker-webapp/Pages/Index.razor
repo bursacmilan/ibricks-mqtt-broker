@@ -2,12 +2,10 @@
 @using ibricks_mqtt_broker.Services.Interface
 @using ibricks_mqtt_broker.Model
 @using ibricks_mqtt_broker.Services
-@using ibricks_mqtt_broker.Model.DeviceState
 @using ibricks_mqtt_broker_webapp.Components
 @inject ICelloStoreService CelloStoreService
 @inject IUdpSenderService UdpSenderService;
 @inject IIpMacService IpMacService;
-@inject IDialogService DialogService
 
 <MudText Typo="Typo.h4">Discovered cellos</MudText>
 
@@ -26,165 +24,34 @@
                 <MudText Typo="Typo.h6">@cello.Description</MudText>
             </CardHeaderContent>
             <CardHeaderActions>
-                <MudIconButton Icon="@Icons.Material.Filled.Lightbulb" Color="Color.Default" OnClick="@(() => IdentityCello(cello))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Lightbulb" Color="Color.Default" OnClick="@( async () => await IdentityCello(cello))"/>
             </CardHeaderActions>
         </MudCardHeader>
         <MudCardContent>
             <MudExpansionPanels MultiExpansion="false">
                 @if (cello.MeteoStates.Count > 0)
                 {
-                    <MudExpansionPanel>
-                        <TitleContent>
-                            <MudText Class="mt-1">Meteo (@cello.MeteoStates.Count)</MudText>
-                        </TitleContent>
-                        
-                        <ChildContent>
-                            <MudTable Items="cello.MeteoStates" Hover="true" Breakpoint="Breakpoint.Sm">
-                                <HeaderContent>
-                                    <MudTh>Channel</MudTh>
-                                    <MudTh>Current</MudTh>
-                                    <MudTh>MQTT Publish</MudTh>
-                                    <MudTh>MQTT Subscribe</MudTh>
-                                    <MudTh>Homeassistant</MudTh>
-                                </HeaderContent>
-                                <RowTemplate>
-                                    <MudTd DataLabel="Channel">@context.Value.Channel</MudTd>
-                                    <MudTd DataLabel="Current">@context.Value.Current</MudTd>
-                                    <MudTd DataLabel="MQTT Publish">@context.Value.GetMqttStateTopic()</MudTd>
-                                    <MudTd DataLabel="MQTT Subscribe">@context.Value.GetMqttCommandTopic()</MudTd>
-                                    <MudTd DataLabel="Homeassistant">
-                                        <MudIconButton Icon="@Icons.Material.Filled.CopyAll" aria-label="copy" OnClick="() => OpenDialog(cello, context.Value)"></MudIconButton>
-                                    </MudTd>
-                                </RowTemplate>
-                            </MudTable>
-                        </ChildContent>
-                    </MudExpansionPanel>
+                    <DeviceStates Title="Meteo" Cello="cello" AllDeviceStates="cello.MeteoStates"></DeviceStates>
                 }
 
                 @if (cello.ClimateStates.Count > 0)
                 {
-                    <MudExpansionPanel>
-                        <TitleContent>
-                            <MudText Class="mt-1">Climate (@cello.ClimateStates.Count)</MudText>
-                        </TitleContent>
-                        
-                        <ChildContent>
-                            <MudTable Items="cello.ClimateStates" Hover="true" Breakpoint="Breakpoint.Sm">
-                                <HeaderContent>
-                                    <MudTh>Channel</MudTh>
-                                    <MudTh>Set to</MudTh>
-                                    <MudTh>MQTT Publish</MudTh>
-                                    <MudTh>MQTT Subscribe</MudTh>
-                                    <MudTh>Homeassistant</MudTh>
-                                </HeaderContent>
-                                <RowTemplate>
-                                    <MudTd DataLabel="Channel">@context.Value.Channel</MudTd>
-                                    <MudTd DataLabel="Current">@context.Value.SetTo</MudTd>
-                                    <MudTd DataLabel="MQTT Publish">@context.Value.GetMqttStateTopic()</MudTd>
-                                    <MudTd DataLabel="MQTT Subscribe">@context.Value.GetMqttCommandTopic()</MudTd>
-                                    <MudTd DataLabel="Homeassistant">
-                                        <MudIconButton Icon="@Icons.Material.Filled.CopyAll" aria-label="copy" OnClick="() => OpenDialog(cello, context.Value)"></MudIconButton>
-                                    </MudTd>
-                                </RowTemplate>
-                            </MudTable>
-                        </ChildContent>
-                    </MudExpansionPanel>
+                    <DeviceStates Title="Climate" Cello="cello" AllDeviceStates="cello.ClimateStates"></DeviceStates>
                 }
 
                 @if (cello.RelayStates.Count > 0)
                 {
-                    <MudExpansionPanel>
-                        <TitleContent>
-                            <MudText Class="mt-1">Relay (@cello.RelayStates.Count)</MudText>
-                        </TitleContent>
-                        
-                        <ChildContent>
-                            <MudTable Items="cello.RelayStates" Hover="true" Breakpoint="Breakpoint.Sm">
-                                <HeaderContent>
-                                    <MudTh>Channel</MudTh>
-                                    <MudTh>Is on</MudTh>
-                                    <MudTh>MQTT Publish</MudTh>
-                                    <MudTh>MQTT Subscribe</MudTh>
-                                    <MudTh>Homeassistant</MudTh>
-                                </HeaderContent>
-                                <RowTemplate>
-                                    <MudTd DataLabel="Channel">@context.Value.Channel</MudTd>
-                                    <MudTd DataLabel="Current">@context.Value.IsOn</MudTd>
-                                    <MudTd DataLabel="MQTT Publish">@context.Value.GetMqttStateTopic()</MudTd>
-                                    <MudTd DataLabel="MQTT Subscribe">@context.Value.GetMqttCommandTopic()</MudTd>
-                                    <MudTd DataLabel="Homeassistant">
-                                        <MudIconButton Icon="@Icons.Material.Filled.CopyAll" aria-label="copy" OnClick="() => OpenDialog(cello, context.Value)"></MudIconButton>
-                                    </MudTd>
-                                </RowTemplate>
-                            </MudTable>
-                        </ChildContent>
-                    </MudExpansionPanel>
+                    <DeviceStates Title="Relay" Cello="cello" AllDeviceStates="cello.RelayStates"></DeviceStates>
                 }
 
                 @if (cello.DimmerStates.Count > 0)
                 {
-                    <MudExpansionPanel>
-                        <TitleContent>
-                            <MudText Class="mt-1">Dimmer (@cello.DimmerStates.Count)</MudText>
-                        </TitleContent>
-                        
-                        <ChildContent>
-                            <MudTable Items="cello.DimmerStates" Hover="true" Breakpoint="Breakpoint.Sm">
-                                <HeaderContent>
-                                    <MudTh>Channel</MudTh>
-                                    <MudTh>Is on</MudTh>
-                                    <MudTh>Value</MudTh>
-                                    <MudTh>MQTT Publish</MudTh>
-                                    <MudTh>MQTT Subscribe</MudTh>
-                                    <MudTh>Homeassistant</MudTh>
-                                </HeaderContent>
-                                <RowTemplate>
-                                    <MudTd DataLabel="Channel">@context.Value.Channel</MudTd>
-                                    <MudTd DataLabel="Current">@context.Value.IsOn</MudTd>
-                                    <MudTd DataLabel="Current">@context.Value.Value</MudTd>
-                                    <MudTd DataLabel="MQTT Publish">@context.Value.GetMqttStateTopic()</MudTd>
-                                    <MudTd DataLabel="MQTT Subscribe">@context.Value.GetMqttCommandTopic()</MudTd>
-                                    <MudTd DataLabel="Homeassistant">
-                                        <MudIconButton Icon="@Icons.Material.Filled.CopyAll" aria-label="copy" OnClick="() => OpenDialog(cello, context.Value)"></MudIconButton>
-                                    </MudTd>
-                                </RowTemplate>
-                            </MudTable>
-                        </ChildContent>
-                    </MudExpansionPanel>
+                    <DeviceStates Title="Dimmer" Cello="cello" AllDeviceStates="cello.DimmerStates"></DeviceStates>
                 }
 
                 @if (cello.CoverStates.Count > 0)
                 {
-                    <MudExpansionPanel>
-                        <TitleContent>
-                            <MudText Class="mt-1">Cover (@cello.CoverStates.Count)</MudText>
-                        </TitleContent>
-                        
-                        <ChildContent>
-                            <MudTable Items="cello.CoverStates" Hover="true" Breakpoint="Breakpoint.Sm">
-                                <HeaderContent>
-                                    <MudTh>Channel</MudTh>
-                                    <MudTh>Current position</MudTh>
-                                    <MudTh>Current tilt position</MudTh>
-                                    <MudTh>Current moving state</MudTh>
-                                    <MudTh>MQTT Publish</MudTh>
-                                    <MudTh>MQTT Subscribe</MudTh>
-                                    <MudTh>Homeassistant</MudTh>
-                                </HeaderContent>
-                                <RowTemplate>
-                                    <MudTd DataLabel="Channel">@context.Value.Channel</MudTd>
-                                    <MudTd DataLabel="Current">@context.Value.CurrentPosition</MudTd>
-                                    <MudTd DataLabel="Current">@context.Value.TiltPosition</MudTd>
-                                    <MudTd DataLabel="Current">@context.Value.CurrentMovingState</MudTd>
-                                    <MudTd DataLabel="MQTT Publish">@context.Value.GetMqttStateTopic()</MudTd>
-                                    <MudTd DataLabel="MQTT Subscribe">@context.Value.GetMqttCommandTopic()</MudTd>
-                                    <MudTd DataLabel="Homeassistant">
-                                        <MudIconButton Icon="@Icons.Material.Filled.CopyAll" aria-label="copy" OnClick="() => OpenDialog(cello, context.Value)"></MudIconButton>
-                                    </MudTd>
-                                </RowTemplate>
-                            </MudTable>
-                        </ChildContent>
-                    </MudExpansionPanel>
+                    <DeviceStates Title="Cover" Cello="cello" AllDeviceStates="cello.CoverStates"></DeviceStates>
                 }
             </MudExpansionPanels>
         </MudCardContent>
@@ -195,15 +62,12 @@
 {
     private Cello[] _cellos = [];
     private Cello[] _allCellos = [];
-    
+
     private string _searchText = string.Empty;
 
     public string SearchText
     {
-        get
-        {
-            return this._searchText;
-        }
+        get => _searchText;
         set
         {
             _searchText = value;
@@ -223,7 +87,7 @@
         _cellos = CelloStoreService.GetAllCellos();
         _allCellos = _cellos;
     }
-    
+
     private async Task DiscoverClickAsync()
     {
         var message = new IbricksMessage
@@ -275,15 +139,7 @@
                 }
             }
         };
-                
-        await UdpSenderService.SendMessageAsync(cello.Ip, NetworkDefaults.UdpPort, climateMessage);
-    }
-    
-    private void OpenDialog(Cello cello, DeviceState deviceState)
-    {
-        var options = new DialogOptions {CloseOnEscapeKey = true};
-        var parameters = new DialogParameters<CopyYamlDialog> {{x => x.DeviceState, deviceState}, {x => x.Cello, cello}};
 
-        DialogService.Show<CopyYamlDialog>("YAML Configuration", parameters, options);
+        await UdpSenderService.SendMessageAsync(cello.Ip, NetworkDefaults.UdpPort, climateMessage);
     }
 }

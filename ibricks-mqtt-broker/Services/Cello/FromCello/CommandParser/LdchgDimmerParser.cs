@@ -35,7 +35,7 @@ public class LdchgDimmerParser(
         }
 
         var value = (int) (v * 100);
-        var state = cello.AddOrUpdateState(message.Channel, cello.DimmerStates, state =>
+        var state = celloStoreService.AddOrUpdateState(cello, message.Channel, cello.DimmerStates, state =>
         {
             state.Value = value;
             state.IsOn = value > 0;

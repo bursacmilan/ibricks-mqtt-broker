@@ -4,6 +4,8 @@ namespace ibricks_mqtt_broker.Model.DeviceState;
 
 public abstract class DeviceState(DeviceStates deviceState)
 {
+    public string? DisplayName { get; set; }
+    public string? UniqueId { get; set; }
     public required int Channel { get; init; }
     public required string CelloMacAddress { get; init; }
 

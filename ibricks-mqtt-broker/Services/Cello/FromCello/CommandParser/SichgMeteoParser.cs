@@ -30,7 +30,7 @@ public class SichgMeteoParser(ILogger logger, ICelloStoreService celloStoreServi
             return;
         }
         
-        var state = cello.AddOrUpdateState(message.Channel, cello.MeteoStates, state =>
+        var state = celloStoreService.AddOrUpdateState(cello, message.Channel, cello.MeteoStates, state =>
         {
             state.Current = v.Value;
         }, () => new MeteoState

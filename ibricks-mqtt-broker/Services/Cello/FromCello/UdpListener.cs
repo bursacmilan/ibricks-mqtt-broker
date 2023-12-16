@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using System.Text;
 using ibricks_mqtt_broker.Services.Interface;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace ibricks_mqtt_broker.Services.Cello.FromCello;
@@ -9,18 +10,15 @@ public class UdpListener : IDisposable
 {
     private readonly ILogger _logger;
     private readonly int _port;
-    private readonly IIbricksMessageParserService _ibricksMessageParserService;
-    private readonly IIbricksMessageInterpretor _ibricksMessageInterpretor;
+    private readonly IServiceProvider _serviceProvider;
 
     private UdpClient? _udpClient;
 
-    public UdpListener(ILogger logger, int port, IIbricksMessageParserService ibricksMessageParserService,
-        IIbricksMessageInterpretor ibricksMessageInterpretor)
+    public UdpListener(ILogger logger, int port, IServiceProvider serviceProvider)
     {
         _logger = logger;
         _port = port;
-        _ibricksMessageParserService = ibricksMessageParserService;
-        _ibricksMessageInterpretor = ibricksMessageInterpretor;
+        _serviceProvider = serviceProvider;
 
         InitUdpClient();
     }
@@ -44,8 +42,15 @@ public class UdpListener : IDisposable
                 {
                     _logger.LogDebug("Received message from {Ip}: {Message}", ip, content);
 
-                    var parsedMessage = _ibricksMessageInterpretor.Interpret(content);
-                    await _ibricksMessageParserService.ParseMessageAsync(parsedMessage);
+                    using var scope = _serviceProvider.CreateScope();
+                    var ibricksMessageInterpretor =
+                        scope.ServiceProvider.GetRequiredService<IIbricksMessageInterpretor>();
+                    
+                    var ibricksMessageParserService =
+                        scope.ServiceProvider.GetRequiredService<IIbricksMessageParserService>();
+                    
+                    var parsedMessage = ibricksMessageInterpretor.Interpret(content);
+                    await ibricksMessageParserService.ParseMessageAsync(parsedMessage);
                 }
                 catch (Exception e)
                 {

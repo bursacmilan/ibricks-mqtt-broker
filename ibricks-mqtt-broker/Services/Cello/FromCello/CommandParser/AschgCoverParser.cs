@@ -62,7 +62,7 @@ public class AschgCoverParser(ILogger logger, ICelloStoreService celloStoreServi
         var currentPositionInt = currentPosition != null ? ConvertPosition(currentPosition) : null;
         var tiltPositionInt = tiltPosition != null ? ConvertPosition(tiltPosition) : null;
         
-        var state = cello.AddOrUpdateState(message.Channel, cello.CoverStates, state =>
+        var state = celloStoreService.AddOrUpdateState(cello, message.Channel, cello.CoverStates, state =>
         {
             state.CurrentPosition = currentPositionInt ?? state.CurrentPosition;
             state.CurrentMovingState = movingState ?? state.CurrentMovingState;
