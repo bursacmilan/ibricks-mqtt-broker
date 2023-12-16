@@ -12,3 +12,9 @@
   tilt_command_template: >
     {{value}}
   tilt_command_topic: "{command_cover}"
+  command_topic: "{command_cover}"
+  payload_open: >
+    { "CurrentPosition": 100 }
+  payload_close: >
+    { "CurrentPosition": 0 }
+  optimistic: true
