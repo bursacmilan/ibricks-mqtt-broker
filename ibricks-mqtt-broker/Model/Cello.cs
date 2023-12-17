@@ -8,13 +8,13 @@ namespace ibricks_mqtt_broker.Model;
 public class Cello
 {
     [Required]
-    public required string Ip { get; init; }
+    public required string Ip { get; set; }
     
     [Required]
-    public required string Description { get; init; }
+    public required string Description { get; set; }
     
     [Key]
-    public required string Mac { get; init; }
+    public required string Mac { get; set; }
     
     public IbricksHardwareInfo? HardwareInfo { get; set; }
 

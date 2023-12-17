@@ -17,9 +17,14 @@ public class CelloStoreService(ILogger<CelloStoreService> logger, DatabaseContex
             Ip = ip
         };
 
-        if (dbContext.Cellos.AsNoTracking().FirstOrDefault(c => c.Mac == mac) != null)
+        var existing = dbContext.Cellos.FirstOrDefault(c => c.Mac == mac);
+        if (existing != null)
         {
-            dbContext.Update(cello);
+            existing.Description = description;
+            existing.Mac = mac;
+            existing.Ip = ip;
+            
+            dbContext.Update(existing);
             await dbContext.SaveChangesAsync();
             return;
         }
