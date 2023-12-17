@@ -72,7 +72,7 @@
 
         deviceState.Published = setTo;
 
-        var json = setTo ? deviceState.GetYaml(Cello) : string.Empty;
+        var json = setTo ? deviceState.GetJson(Cello) : string.Empty;
         var publishTo = $"homeassistant/{deviceState.GetHomeAssistantType()}/{deviceState.UniqueId}/config";
 
         await CelloStoreService.UpdateStateAsync(Cello, deviceState.Channel, AllDeviceStates, state =>

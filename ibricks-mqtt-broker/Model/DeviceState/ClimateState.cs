@@ -7,7 +7,7 @@ public class ClimateState() : DeviceState(DeviceStates.ClimateState)
     public decimal SetTo { get; set; }
     public string Mode => "auto";
     
-    public override string GetYaml(Cello cello)
+    public override string GetJson(Cello cello)
     {
         var meteo = cello.MeteoStates.Values.FirstOrDefault(c => c.Channel == Channel) ??
                     cello.MeteoStates.Values.FirstOrDefault();

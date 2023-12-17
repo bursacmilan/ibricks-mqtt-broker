@@ -33,7 +33,7 @@ public abstract class DeviceState(DeviceStates deviceState)
         return _mqttCommandTopic;
     }
 
-    public abstract string GetYaml(Cello cello);
+    public abstract string GetJson(Cello cello);
     public abstract string GetHomeAssistantType();
 
     protected string GetJsonFromEmbeddedResource(string name, string command, string state)

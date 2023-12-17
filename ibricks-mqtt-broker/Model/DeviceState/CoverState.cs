@@ -10,7 +10,7 @@ public class CoverState() : DeviceState(DeviceStates.CoverState)
     public int TiltPosition { get; set; }
     public string CurrentMovingState { get; set; } = MovingStopped;
     
-    public override string GetYaml(Cello cello)
+    public override string GetJson(Cello cello)
     {
         return GetJsonFromEmbeddedResource("Cover", GetMqttCommandTopic(), GetMqttStateTopic());
     }

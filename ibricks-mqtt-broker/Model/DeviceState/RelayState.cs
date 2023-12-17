@@ -4,7 +4,7 @@ public class RelayState() : DeviceState(DeviceStates.RelayState)
 {
     public bool IsOn { get; set; }
     
-    public override string GetYaml(Cello cello)
+    public override string GetJson(Cello cello)
     {
         return GetJsonFromEmbeddedResource("Relay", GetMqttCommandTopic(), GetMqttStateTopic());
     }

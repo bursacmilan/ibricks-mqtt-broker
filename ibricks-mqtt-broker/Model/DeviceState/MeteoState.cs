@@ -4,7 +4,7 @@ public class MeteoState() : DeviceState(DeviceStates.MeteoState)
 {
     public decimal Current { get; set; }
     
-    public override string GetYaml(Cello cello)
+    public override string GetJson(Cello cello)
     {
         return GetJsonFromEmbeddedResource("Meteo", GetMqttCommandTopic(), GetMqttStateTopic());
     }
