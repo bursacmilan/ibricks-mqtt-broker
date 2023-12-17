@@ -3,6 +3,8 @@
 @using System.Text.Json
 @using ibricks_mqtt_broker.Services.Interface
 @inject IDialogService DialogService
+@inject IMqttPublisherService MqttPublisherService
+@inject ICelloStoreService CelloStoreService
 @typeparam T where T : ibricks_mqtt_broker.Model.DeviceState.DeviceState;
 
 <MudExpansionPanel>
@@ -14,8 +16,10 @@
         <MudTable Items="AllDeviceStates" Hover="true" Breakpoint="Breakpoint.Sm">
             <HeaderContent>
                 <MudTh>Actions</MudTh>
+                <MudTh>Publish</MudTh>
                 <MudTh>Displayname</MudTh>
                 <MudTh>Unique ID</MudTh>
+                <MudTh>Last Update</MudTh>
                 <MudTh>Channel</MudTh>
                 <MudTh>Current JSON Value</MudTh>
                 <MudTh>MQTT Publish</MudTh>
@@ -23,10 +27,14 @@
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Actions">
-                    <MudIconButton Icon="@Icons.Material.Filled.ChangeCircle" aria-label="copy" OnClick="@( async () => await ChangeName(Cello, context.Value))"></MudIconButton>
+                    <MudIconButton Icon="@Icons.Material.Filled.ChangeCircle" aria-label="copy" OnClick="@(async () => await ChangeName(Cello, context.Value))"></MudIconButton>
+                </MudTd>
+                <MudTd DataLabel="Publish">
+                    <MudCheckBox @bind-Checked:get=context.Value.Published @bind-Checked:set="b => PublishStateChanged(b, context.Value)"></MudCheckBox>
                 </MudTd>
                 <MudTd DataLabel="Displayname">@context.Value.DisplayName</MudTd>
                 <MudTd DataLabel="Unique ID">@context.Value.UniqueId</MudTd>
+                <MudTd DataLabel="Last Update">@((int) (DateTime.Now - (context.Value.LastUpdate ?? DateTime.MinValue)).TotalMinutes) minutes ago</MudTd>
                 <MudTd DataLabel="Channel">@context.Value.Channel</MudTd>
                 <MudTd DataLabel="Current JSON Value">@JsonSerializer.Serialize(context.Value)</MudTd>
                 <MudTd DataLabel="MQTT Publish">@context.Value.GetMqttStateTopic()</MudTd>
@@ -40,7 +48,7 @@
     [Parameter] public required Dictionary<int, T> AllDeviceStates { get; set; }
     [Parameter] public required Cello Cello { get; set; }
     [Parameter] public required string Title { get; set; }
-    
+
     private async Task ChangeName(Cello cello, DeviceState deviceState)
     {
         var options = new DialogOptions {CloseOnEscapeKey = true};
@@ -55,4 +63,24 @@
         await reference.WaitAsync(CancellationToken.None);
         StateHasChanged();
     }
+
+    private async Task PublishStateChanged(object val, DeviceState deviceState)
+    {
+        var setTo = (bool) val;
+        if (string.IsNullOrEmpty(deviceState.UniqueId) || string.IsNullOrEmpty(deviceState.DisplayName))
+            return;
+
+        deviceState.Published = setTo;
+
+        var json = setTo ? deviceState.GetYaml(Cello) : string.Empty;
+        var publishTo = $"homeassistant/{deviceState.GetHomeAssistantType()}/{deviceState.UniqueId}/config";
+
+        await CelloStoreService.UpdateStateAsync(Cello, deviceState.Channel, AllDeviceStates, state =>
+        {
+            state.Published = setTo;
+        });
+
+        await MqttPublisherService.PublishMessageAsync(publishTo, json);
+    }
+
 }

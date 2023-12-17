@@ -10,15 +10,10 @@ public class CoverState() : DeviceState(DeviceStates.CoverState)
     public int TiltPosition { get; set; }
     public string CurrentMovingState { get; set; } = MovingStopped;
     
-    public override string GetYaml(Cello cello, string name)
+    public override string GetYaml(Cello cello)
     {
-        var yaml = GetYaml("Cover");
-        yaml = yaml.Replace("{name}", name)
-            .Replace("{state_cover}", GetMqttStateTopic())
-            .Replace("{command_cover}", GetMqttCommandTopic())
-            .Replace("{area}", name.Split(" ").First())
-            .Replace("{uid}", name.ToLower().Replace(" ", "-"));
-
-        return yaml;
+        return GetJsonFromEmbeddedResource("Cover", GetMqttCommandTopic(), GetMqttStateTopic());
     }
+    
+    public override string GetHomeAssistantType() => "cover";
 }

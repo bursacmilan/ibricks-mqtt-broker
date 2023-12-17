@@ -4,15 +4,10 @@ public class MeteoState() : DeviceState(DeviceStates.MeteoState)
 {
     public decimal Current { get; set; }
     
-    public override string GetYaml(Cello cello, string name)
+    public override string GetYaml(Cello cello)
     {
-        var yaml = GetYaml("Meteo");
-        yaml = yaml.Replace("{name}", name)
-            .Replace("{state_meteo}", GetMqttStateTopic())
-            .Replace("{command_meteo}", GetMqttCommandTopic())
-            .Replace("{area}", name.Split(" ").First())
-            .Replace("{uid}", name.ToLower().Replace(" ", "-"));
-
-        return yaml;
+        return GetJsonFromEmbeddedResource("Meteo", GetMqttCommandTopic(), GetMqttStateTopic());
     }
+    
+    public override string GetHomeAssistantType() => "sensor";
 }

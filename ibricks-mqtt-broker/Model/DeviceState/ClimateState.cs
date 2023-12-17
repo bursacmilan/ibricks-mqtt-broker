@@ -7,15 +7,14 @@ public class ClimateState() : DeviceState(DeviceStates.ClimateState)
     public decimal SetTo { get; set; }
     public string Mode => "auto";
     
-    public override string GetYaml(Cello cello, string name)
+    public override string GetYaml(Cello cello)
     {
-        var yaml = GetYaml("Climate");
-        yaml = yaml.Replace("{name}", name).Replace("{state_meteostate}", "TODO")
-            .Replace("{state_climatestate}", GetMqttStateTopic())
-            .Replace("{command_climatestate}", GetMqttCommandTopic())
-            .Replace("{area}", name.Split(" ").First())
-            .Replace("{uid}", name.ToLower().Replace(" ", "-"));
+        var meteo = cello.MeteoStates.Values.FirstOrDefault(c => c.Channel == Channel) ??
+                    cello.MeteoStates.Values.FirstOrDefault();
 
-        return yaml;
+        return GetJsonFromEmbeddedResource("Climate", GetMqttCommandTopic(), GetMqttStateTopic())
+            .Replace("{state_meteostate}", meteo?.GetMqttStateTopic());
     }
+
+    public override string GetHomeAssistantType() => "climate";
 }

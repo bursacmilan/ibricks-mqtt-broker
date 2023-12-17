@@ -21,15 +21,15 @@
 
     <ItemGroup>
       <None Remove="Model\DeviceState\Yaml\ClimateYaml" />
-      <EmbeddedResource Include="Model\DeviceState\Yaml\Climate.yaml" />
+      <EmbeddedResource Include="Model\DeviceState\Json\Climate.json" />
+      <EmbeddedResource Include="Model\DeviceState\Json\Cover.json" />
+      <EmbeddedResource Include="Model\DeviceState\Json\Dimmer.json" />
+      <EmbeddedResource Include="Model\DeviceState\Json\Meteo.json" />
+      <EmbeddedResource Include="Model\DeviceState\Json\Relay.json" />
       <None Remove="Model\DeviceState\Yaml\Cover.yaml" />
-      <EmbeddedResource Include="Model\DeviceState\Yaml\Cover.yaml" />
       <None Remove="Model\DeviceState\Yaml\Dimmer.yaml" />
-      <EmbeddedResource Include="Model\DeviceState\Yaml\Dimmer.yaml" />
       <None Remove="Model\DeviceState\Yaml\Meteo.yaml" />
-      <EmbeddedResource Include="Model\DeviceState\Yaml\Meteo.yaml" />
       <None Remove="Model\DeviceState\Yaml\Relay.yaml" />
-      <EmbeddedResource Include="Model\DeviceState\Yaml\Relay.yaml" />
     </ItemGroup>
 
 </Project>

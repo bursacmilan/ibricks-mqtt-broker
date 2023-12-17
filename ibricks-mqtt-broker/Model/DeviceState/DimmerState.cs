@@ -5,15 +5,10 @@ public class DimmerState() : DeviceState(DeviceStates.DimmerState)
     public int Value { get; set; }
     public bool IsOn { get; set; }
     
-    public override string GetYaml(Cello cello, string name)
+    public override string GetYaml(Cello cello)
     {
-        var yaml = GetYaml("Dimmer");
-        yaml = yaml.Replace("{name}", name)
-            .Replace("{state_dimmer}", GetMqttStateTopic())
-            .Replace("{command_dimmer}", GetMqttCommandTopic())
-            .Replace("{area}", name.Split(" ").First())
-            .Replace("{uid}", name.ToLower().Replace(" ", "-"));
-        
-        return yaml;
+        return GetJsonFromEmbeddedResource("Dimmer", GetMqttCommandTopic(), GetMqttStateTopic());
     }
+    
+    public override string GetHomeAssistantType() => "light";
 }

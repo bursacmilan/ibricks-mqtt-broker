@@ -1,4 +1,5 @@
 using ibricks_mqtt_broker.Database;
+using ibricks_mqtt_broker.Model.DeviceState;
 using ibricks_mqtt_broker.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -49,11 +50,11 @@ public class CelloStoreService(ILogger<CelloStoreService> logger, DatabaseContex
 
     public Task<Model.Cello[]> GetAllCellosAsync()
     {
-        return dbContext.Cellos.AsNoTracking().ToArrayAsync();
+        return dbContext.Cellos.AsNoTracking().OrderBy(c => c.Description).ToArrayAsync();
     }
 
     public async Task<T> AddOrUpdateStateAsync<T>(Model.Cello cello, int channel, Dictionary<int, T> states,
-        Action<T> updateState, Func<T> newState)
+        Action<T> updateState, Func<T> newState) where T : DeviceState
     {
         if (states.TryGetValue(channel, out var state))
         {
@@ -65,18 +66,21 @@ public class CelloStoreService(ILogger<CelloStoreService> logger, DatabaseContex
             states[channel] = state;
         }
 
+        state.LastUpdate = DateTime.Now;
         dbContext.Cellos.Update(cello);
         await dbContext.SaveChangesAsync();
         return state;
     }
 
     public async Task<T> UpdateStateAsync<T>(Model.Cello cello, int channel, Dictionary<int, T> states,
-        Action<T> updateState)
+        Action<T> updateState) where T : DeviceState
     {
         if (!states.TryGetValue(channel, out var existingState))
             throw new Exception($"No current state found for channel {channel} on cello {cello.Mac}");
 
         updateState(existingState);
+        existingState.LastUpdate = DateTime.Now;
+
         dbContext.Cellos.Update(cello);
         await dbContext.SaveChangesAsync();
 
@@ -84,6 +88,7 @@ public class CelloStoreService(ILogger<CelloStoreService> logger, DatabaseContex
     }
 
     public Task<T?> GetCurrentStateAsync<T>(Model.Cello cello, int channel, Dictionary<int, T> states)
+        where T : DeviceState
     {
         return Task.FromResult(states.GetValueOrDefault(channel));
     }
