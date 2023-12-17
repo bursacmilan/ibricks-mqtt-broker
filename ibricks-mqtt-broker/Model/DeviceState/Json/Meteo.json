@@ -1,0 +1,7 @@
+{
+  "name": "{name}",
+  "unique_id": "{uid}",
+  "state_topic": "{state}",
+  "unit_of_measurement": "°C",
+  "value_template": "{{ value_json.Current }}"
+}

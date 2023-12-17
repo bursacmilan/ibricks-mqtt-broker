@@ -1,0 +1,15 @@
+{
+  "name": "{name}",
+  "unique_id": "{uid}",
+  "payload_on": true,
+  "payload_off": false,
+  "brightness_scale": 100,
+  "brightness_command_template": "{ \"Value\": {{value}} }",
+  "on_command_type": "brightness",
+  "state_topic": "{state}",
+  "command_topic": "{command}",
+  "state_value_template": "{{ value_json.IsOn }}",
+  "brightness_state_topic": "{state}",
+  "brightness_command_topic": "{command}",
+  "brightness_value_template": "{{ value_json.Value }}"
+}
