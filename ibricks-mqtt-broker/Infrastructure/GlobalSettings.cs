@@ -15,6 +15,8 @@ public class GlobalSettings
     public string[]? DisableTilt { get; set; }
 
     public MqttSettings? MqttSettings { get; set; }
+    
+    public string? DatabaseDirectory { get; set; }
 }
 
 public class MqttSettings

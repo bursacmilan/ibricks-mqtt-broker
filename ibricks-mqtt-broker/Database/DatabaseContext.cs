@@ -1,8 +1,10 @@
 using System.Reflection;
 using System.Text.Json;
+using ibricks_mqtt_broker.Infrastructure;
 using ibricks_mqtt_broker.Model;
 using ibricks_mqtt_broker.Model.DeviceState;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace ibricks_mqtt_broker.Database;
 
@@ -12,10 +14,19 @@ public class DatabaseContext : DbContext
 
     private readonly string _dbPath;
     
-    public DatabaseContext()
+    public DatabaseContext(IOptionsMonitor<GlobalSettings> globalSettingsOptionsMonitor)
     {
-        var assemblyPath = Assembly.GetExecutingAssembly().Location;
-        var directory = Path.GetDirectoryName(assemblyPath);
+        string? directory;
+        if (globalSettingsOptionsMonitor.CurrentValue.DatabaseDirectory == null)
+        {
+            var assemblyPath = Assembly.GetExecutingAssembly().Location;
+            directory = Path.GetDirectoryName(assemblyPath);
+        }
+        else
+        {
+            directory = globalSettingsOptionsMonitor.CurrentValue.DatabaseDirectory;
+        }
+        
         if (directory == null)
             throw new Exception("Path is NULL");
 
