@@ -18,4 +18,5 @@ public sealed class IbricksMessageCommands(string name, int value) : SmartEnum<I
     public static IbricksMessageCommands LRSET = new(nameof(LRSET), 9);
     public static IbricksMessageCommands BDSET = new(nameof(BDSET), 10);
     public static IbricksMessageCommands ASSET = new(nameof(ASSET), 11);
+    public static IbricksMessageCommands SSGES = new(nameof(SSGES), 12);
 }

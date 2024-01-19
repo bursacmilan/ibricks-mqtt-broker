@@ -32,4 +32,7 @@ public class Cello
     
     [Required]
     public Dictionary<int, CoverState> CoverStates { get; } = new();
+    
+    [Required]
+    public Dictionary<int, EventState> EventStates { get; } = new();
 }

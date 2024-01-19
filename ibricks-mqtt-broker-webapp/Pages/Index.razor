@@ -53,6 +53,11 @@
                 {
                     <DeviceStates Title="Cover" Cello="cello" AllDeviceStates="cello.CoverStates"></DeviceStates>
                 }
+                
+                @if (cello.EventStates.Count > 0)
+                {
+                    <DeviceStates Title="Event" Cello="cello" AllDeviceStates="cello.EventStates"></DeviceStates>
+                }
             </MudExpansionPanels>
         </MudCardContent>
     </MudCard>

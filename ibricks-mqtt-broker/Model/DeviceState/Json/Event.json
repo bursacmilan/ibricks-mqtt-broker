@@ -1,0 +1,8 @@
+{
+  "name": "{name}",
+  "unique_id": "{uid}",
+  "state_topic": "{state}",
+  "event_types": [
+    "press"
+  ]
+}
