@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ibricks_mqtt_broker.Model;
 using ibricks_mqtt_broker.Model.DeviceState;
 using ibricks_mqtt_broker.Services.Interface;
@@ -39,7 +40,7 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
                     CelloMacAddress = cello.Mac
                 });
 
-        await mqttPublisherService.PublishMessageAsync(state.GetMqttStateTopic(), EventState.Press,
+        await mqttPublisherService.PublishMessageAsync(state.GetMqttStateTopic(), JsonSerializer.Serialize(state),
             false);
     }
 }
