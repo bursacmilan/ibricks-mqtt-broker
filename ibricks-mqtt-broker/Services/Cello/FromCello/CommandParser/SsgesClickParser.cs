@@ -24,6 +24,20 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
             return;
         }
 
+        if (st.Equals("FullTouch;XlongClick", StringComparison.InvariantCulture))
+        {
+            logger.LogDebug("Long click full touch triggered. Creating global event command");
+            await mqttPublisherService.PublishMessageAsync("CELLOFULLTOUCH", JsonSerializer.Serialize(new EventState
+                {
+                    EventType = EventState.Press,
+                    Channel = -1,
+                    CelloMacAddress = "ALL"
+                }),
+                false);
+
+            return;
+        }
+
         var channel = st.StartsWith("ClickRight") ? 1 : st.StartsWith("ClickLeft") ? 2 : -1;
         if (channel == -1)
         {

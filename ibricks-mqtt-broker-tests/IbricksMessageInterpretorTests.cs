@@ -57,6 +57,30 @@ public class IbricksMessageInterpretorTests
         message.AdditionalData.Should().NotBeNull().And.HaveCount(2);
         message.AdditionalData!["ST"].Should().Be("ClickRight;Click");
     }
+    
+    [Fact]
+    public void Test_Director_SSGES_FullTouch()
+    {
+        // Arrange
+        var interpretor = new IbricksMessageInterpretor(NullLogger<IbricksMessageInterpretor>.Instance);
+        var messageString =
+            ".KISS|AF=8CAAB5FA2BB5|AT=0000000CLOUD|N=995|E|SSGES|ST=FullTouch;XlongClick|DEBUG=S2,12360,3155594345[0]0,1824,11/9/19/23/22/30/30/38/44/41[5]0,1824,17/36/48/52/52/66/77/86/90/65[6]0,1824,43/57/68/74/74/80/84/85/85/45[8]0,1824,44/41/72/72/118/159/164/184/184/117[9]0,1824,17/24/35/35/40/46/58/71/71/67[11]0,1824,43/62/62/82/103/110/119/119/115/84[2]24,1800,12/18/22/27/27/39/47/52/56/46[10]72,1752,16/20/25/34/40/40/44/43/44/31[3]144,1680,14/17/21/25/25/38/51/55/59/50[4]144,1680,10/13/16/24/24/41/63/77/86/76[7]144,1680,10/11/15/15/22/36/57/69/69/69";
+
+        // Act
+        var message = interpretor.Interpret(messageString);
+
+        // Assert
+        message.Protocol.Should().Be(".KISS");
+        message.AddressFrom.Should().Be("8CAAB5FA2BB5");
+        message.AddressTo.Should().Be("0000000CLOUD");
+        message.Nonce.Should().Be("995");
+        message.Type.Should().Be(IbricksMessageType.E);
+        message.Command.Should().Be(IbricksMessageCommands.SSGES);
+        message.Channel.Should().Be(-1);
+
+        message.AdditionalData.Should().NotBeNull().And.HaveCount(2);
+        message.AdditionalData!["ST"].Should().Be("FullTouch;XlongClick");
+    }
 
     [Fact]
     public void Test_Director_BDCHG()
