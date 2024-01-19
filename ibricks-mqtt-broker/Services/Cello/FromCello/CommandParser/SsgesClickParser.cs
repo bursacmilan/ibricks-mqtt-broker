@@ -30,12 +30,14 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
             return;
         }
 
-        var state = await celloStoreService.AddOrUpdateStateAsync(cello, channel, cello.EventStates, _ => { }, () =>
-            new EventState
-            {
-                Channel = channel,
-                CelloMacAddress = cello.Mac
-            });
+        var state = await celloStoreService.AddOrUpdateStateAsync(cello, channel, cello.EventStates,
+            state => { state.EventType = EventState.Press; }, () =>
+                new EventState
+                {
+                    EventType = EventState.Press,
+                    Channel = channel,
+                    CelloMacAddress = cello.Mac
+                });
 
         await mqttPublisherService.PublishMessageAsync(state.GetMqttStateTopic(), EventState.Press,
             false);

@@ -3,15 +3,18 @@
 @using ibricks_mqtt_broker.Model
 @using ibricks_mqtt_broker.Services
 @using ibricks_mqtt_broker_webapp.Components
+@using ibricks_mqtt_broker.Model.DeviceState
 @inject ICelloStoreService CelloStoreService
 @inject IUdpSenderService UdpSenderService;
 @inject IIpMacService IpMacService;
+@inject IMqttSubscriberService MqttSubscriberService;
 
 <MudText Typo="Typo.h4">Discovered cellos</MudText>
 
 <MudButtonGroup Style="margin: 20px 0 20px 0;" Color="Color.Primary" Size="Size.Large" Variant="Variant.Outlined">
     <MudButton OnClick="@(() => DiscoverClickAsync())">Discover</MudButton>
     <MudButton OnClick="@(async () => await RefreshCellosClick())">Refresh</MudButton>
+    <MudButton OnClick="@(async () => await SubscribeMqtt())">Subscribe MQTT</MudButton>
 </MudButtonGroup>
 
 <MudTextField @bind-Value="SearchText" Label="Filter" Variant="Variant.Outlined"></MudTextField>
@@ -91,6 +94,23 @@
     {
         _cellos = await CelloStoreService.GetAllCellosAsync();
         _allCellos = _cellos;
+    }
+    
+    private async Task SubscribeMqtt()
+    {
+        foreach (var cello in _cellos)
+        {
+            var states = cello.MeteoStates.Values.OfType<DeviceState>()
+                .Concat(cello.CoverStates.Values)
+                .Concat(cello.ClimateStates.Values)
+                .Concat(cello.DimmerStates.Values)
+                .Concat(cello.RelayStates.Values);
+
+            foreach (var state in states)
+            {
+                await MqttSubscriberService.SubscribeToTopicAsync(state.GetMqttCommandTopic());
+            }
+        }
     }
 
     private async Task DiscoverClickAsync()
