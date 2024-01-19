@@ -8,6 +8,7 @@ using ibricks_mqtt_broker.Services.Interface;
 using ibricks_mqtt_broker.Services.Mqtt;
 using ibricks_mqtt_broker.Services.Mqtt.FromMqtt;
 using ibricks_mqtt_broker.Services.Mqtt.ToMqtt;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +39,8 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database.EnsureCreated();
+    var database = scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database;
+    database.Migrate();
 }
 
 // Configure the HTTP request pipeline.
