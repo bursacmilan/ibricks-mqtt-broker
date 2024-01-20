@@ -8,7 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace ibricks_mqtt_broker.Services.Cello.ToCello.DeviceSateUpdater;
 
-public class DimmerStateUpdater(ILogger<DimmerStateUpdater> logger, IUdpSenderService udpSenderService, IIpMacService ipMacService) : IDeviceStateUpdater
+public class DimmerStateUpdater(
+    ILogger<DimmerStateUpdater> logger,
+    IUdpSenderService udpSenderService,
+    IIpMacService ipMacService,
+    ICelloStoreService celloStoreService) : IDeviceStateUpdater
 {
     public async Task UpdateStateAsync(JsonNode deviceStateJson, bool isSingleValueJson, Model.Cello cello, int channel)
     {
@@ -18,14 +22,32 @@ public class DimmerStateUpdater(ILogger<DimmerStateUpdater> logger, IUdpSenderSe
             deviceStateJson[nameof(DimmerState.Value)] =
                 additional.Equals("true", StringComparison.CurrentCultureIgnoreCase) ? 100 : 0;
         }
-                
+
         var dimmerState = deviceStateJson.Deserialize<DimmerState>(JsonSerializerOptionsDefaults.IgnoreCase);
         if (dimmerState == null)
         {
             logger.LogError("Could not parse JSON {Json} to dimmerState", deviceStateJson.ToJsonString());
             return;
         }
-                
+
+        if (channel == DimmerState.GlobalDimmerChannel)
+        {
+            logger.LogDebug("This is a global dimmer. Only updating internally");
+            await celloStoreService.AddOrUpdateStateAsync(cello, channel, cello.DimmerStates, state =>
+            {
+                state.Value = dimmerState.Value;
+                state.IsOn = dimmerState.Value > 0;
+            }, () => new DimmerState
+            {
+                CelloMacAddress = cello.Mac,
+                Channel = channel,
+                IsOn = dimmerState.Value > 0,
+                Value = dimmerState.Value
+            });
+
+            return;
+        }
+
         var dimmerMessage = new IbricksMessage
         {
             Channel = channel,
@@ -38,14 +60,15 @@ public class DimmerStateUpdater(ILogger<DimmerStateUpdater> logger, IUdpSenderSe
             AdditionalData = new Dictionary<string, string>
             {
                 {
-                    IbricksMessageParts.V.Name, ((double) dimmerState.Value / 100).ToString(CultureInfo.InvariantCulture)
+                    IbricksMessageParts.V.Name,
+                    ((double) dimmerState.Value / 100).ToString(CultureInfo.InvariantCulture)
                 },
                 {
                     IbricksMessageParts.X.Name, IbricksMessageConstants.X
                 }
             }
         };
-                
+
         await udpSenderService.SendMessageAsync(cello.Ip, NetworkDefaults.UdpPort, dimmerMessage);
     }
 }

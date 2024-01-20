@@ -36,7 +36,7 @@ public class IbricksMessageParserService(
             nameof(IbricksMessageCommands.ASCHG) => new AschgCoverParser(logger, celloStoreService,
                 mqttPublisherService, mqttSubscriberService),
             nameof(IbricksMessageCommands.SSGES) => new SsgesClickParser(logger, celloStoreService,
-                mqttPublisherService, backgroundHandler),
+                mqttPublisherService, mqttSubscriberService, backgroundHandler),
             _ => null
         };
 

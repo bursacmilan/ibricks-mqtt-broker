@@ -6,10 +6,10 @@ public static class ServiceCollectionExtension
 {
     public static IServiceCollection AddStateUpdater(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddTransient<ClimateStateUpdater>();        
-        serviceCollection.AddTransient<CoverStateUpdater>();        
-        serviceCollection.AddTransient<DimmerStateUpdater>();        
-        serviceCollection.AddTransient<RelayStateUpdater>();        
+        serviceCollection.AddScoped<ClimateStateUpdater>();        
+        serviceCollection.AddScoped<CoverStateUpdater>();        
+        serviceCollection.AddScoped<DimmerStateUpdater>();        
+        serviceCollection.AddScoped<RelayStateUpdater>();        
         
         return serviceCollection;
     }
