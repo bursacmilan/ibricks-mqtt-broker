@@ -1,10 +1,11 @@
 using System.Collections.Concurrent;
 using ibricks_mqtt_broker.Model.DeviceState;
 using ibricks_mqtt_broker.Services.Interface;
+using Microsoft.Extensions.Logging;
 
 namespace ibricks_mqtt_broker.Services.Cello.FromCello;
 
-public class IbricksBackgroundHandler : IIbricksBackgroundHandler
+public class IbricksBackgroundHandler(ILogger<IbricksBackgroundHandler> logger) : IIbricksBackgroundHandler
 {
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _cancellationTokens = new();
     
@@ -17,7 +18,7 @@ public class IbricksBackgroundHandler : IIbricksBackgroundHandler
         _cancellationTokens.AddOrUpdate(id, cancellationTokenSource, (_, _) => cancellationTokenSource);
 
         var round = 0;
-        while (round < maxRounds && !cancellationTokenSource.IsCancellationRequested)
+        while (round < maxRounds && !cancellationTokenSource.Token.IsCancellationRequested)
         {
             await action();
             await Task.Delay(delayInMs, cancellationTokenSource.Token);
@@ -31,7 +32,13 @@ public class IbricksBackgroundHandler : IIbricksBackgroundHandler
     {
         var id = GetId(cello, deviceState, identifier);
         if (_cancellationTokens.TryGetValue(id, out var cancellationToken))
+        {
             await cancellationToken.CancelAsync();
+        }
+        else
+        {
+            logger.LogError("Could not get cancellation token source");
+        }
     }
 
     private string GetId(Model.Cello cello, DeviceStates deviceState, string identifier)
