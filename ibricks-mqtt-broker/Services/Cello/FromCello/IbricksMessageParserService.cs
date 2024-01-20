@@ -12,7 +12,7 @@ public class IbricksMessageParserService(
     IMqttSubscriberService mqttSubscriberService,
     IIpMacService ipMacService,
     IUdpSenderService udpSenderService,
-    IbricksBackgroundHandler backgroundHandler) : IIbricksMessageParserService
+    IIbricksBackgroundHandler backgroundHandler) : IIbricksMessageParserService
 {
     public async Task ParseMessageAsync(IbricksMessage message)
     {
