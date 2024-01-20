@@ -60,17 +60,24 @@ public class UdpListener : IDisposable
 
     private async Task HandleIncomingMessageAsync(string content, string ip)
     {
-        _logger.LogDebug("Received message from {Ip}: {Message}", ip, content);
+        try
+        {
+            _logger.LogDebug("Received message from {Ip}: {Message}", ip, content);
 
-        using var scope = _serviceProvider.CreateScope();
-        var ibricksMessageInterpretor =
-            scope.ServiceProvider.GetRequiredService<IIbricksMessageInterpretor>();
-                    
-        var ibricksMessageParserService =
-            scope.ServiceProvider.GetRequiredService<IIbricksMessageParserService>();
-                    
-        var parsedMessage = ibricksMessageInterpretor.Interpret(content);
-        await ibricksMessageParserService.ParseMessageAsync(parsedMessage);
+            using var scope = _serviceProvider.CreateScope();
+            var ibricksMessageInterpretor =
+                scope.ServiceProvider.GetRequiredService<IIbricksMessageInterpretor>();
+
+            var ibricksMessageParserService =
+                scope.ServiceProvider.GetRequiredService<IIbricksMessageParserService>();
+
+            var parsedMessage = ibricksMessageInterpretor.Interpret(content);
+            await ibricksMessageParserService.ParseMessageAsync(parsedMessage);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("{Error}", e.ToString());
+        }
     }
 
     private void InitUdpClient()
