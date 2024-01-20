@@ -58,7 +58,7 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
             return;
         }
 
-        if (st.Equals("WheelStop", StringComparison.InvariantCultureIgnoreCase))
+        if (st.StartsWith("WheelStop", StringComparison.InvariantCultureIgnoreCase))
         {
             logger.LogDebug("Stopping wheel control");
             await ibricksBackgroundHandler.StopBackgroundActivityAsync(cello, DeviceStates.DimmerState, "WHEEL");
