@@ -22,6 +22,7 @@ builder.Services.AddScoped<ICelloStoreService, CelloStoreService>();
 builder.Services.AddScoped<IIbricksMessageParserService, IbricksMessageParserService>();
 builder.Services.AddScoped<IIbricksStateUpdaterService, IbricksStateUpdaterService>();
 
+builder.Services.AddSingleton<IIbricksBackgroundHandler, IbricksBackgroundHandler>();
 builder.Services.AddSingleton<IIbricksMessageInterpretor, IbricksMessageInterpretor>();
 builder.Services.AddSingleton<IIpMacService, IpMacService>();
 builder.Services.AddSingleton<IUdpSenderService, UdpSenderService>();

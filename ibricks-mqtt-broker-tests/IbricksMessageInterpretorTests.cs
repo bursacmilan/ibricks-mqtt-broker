@@ -81,6 +81,30 @@ public class IbricksMessageInterpretorTests
         message.AdditionalData.Should().NotBeNull().And.HaveCount(2);
         message.AdditionalData!["ST"].Should().Be("FullTouch;XlongClick");
     }
+    
+    [Fact]
+    public void Test_Director_SSGES_Wheel()
+    {
+        // Arrange
+        var interpretor = new IbricksMessageInterpretor(NullLogger<IbricksMessageInterpretor>.Instance);
+        var messageString =
+            ".KISS|AF=8CAAB5FA2BB5|AT=0000000CLOUD|N=1081|E|SSGES|ST=WheelClockwise;1";
+
+        // Act
+        var message = interpretor.Interpret(messageString);
+
+        // Assert
+        message.Protocol.Should().Be(".KISS");
+        message.AddressFrom.Should().Be("8CAAB5FA2BB5");
+        message.AddressTo.Should().Be("0000000CLOUD");
+        message.Nonce.Should().Be("1081");
+        message.Type.Should().Be(IbricksMessageType.E);
+        message.Command.Should().Be(IbricksMessageCommands.SSGES);
+        message.Channel.Should().Be(-1);
+
+        message.AdditionalData.Should().NotBeNull().And.HaveCount(2);
+        message.AdditionalData!["ST"].Should().Be("WheelClockwise;1");
+    }
 
     [Fact]
     public void Test_Director_BDCHG()

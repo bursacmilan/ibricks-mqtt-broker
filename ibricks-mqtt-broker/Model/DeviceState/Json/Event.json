@@ -4,6 +4,5 @@
   "state_topic": "{state}",
   "event_types": [
     "press"
-  ],
-  "enabled_by_default": false
+  ]
 }

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ibricks_mqtt_broker.Services.Cello.FromCello.CommandParser;
 
-public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreService, IMqttPublisherService mqttPublisherService, IMqttSubscriberService mqttSubscriberService) : IIbricksCommandParser
+public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreService, IMqttPublisherService mqttPublisherService, IIbricksBackgroundHandler ibricksBackgroundHandler) : IIbricksCommandParser
 {
     public async Task ParseAsync(IbricksMessage message)
     {
@@ -45,6 +45,25 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
             await HandleChannel(2, cello);
             return;
         }
+
+        if (st.Equals("WheelClockwise;1", StringComparison.InvariantCultureIgnoreCase))
+        {
+            logger.LogDebug("Wheel clockwise starting");
+            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.EventState, "WHEEL", 200,
+                async () =>
+                {
+                    await HandleWheel(cello);
+                }, 20);
+
+            return;
+        }
+
+        if (st.Equals("WheelStop", StringComparison.InvariantCultureIgnoreCase))
+        {
+            logger.LogDebug("Stopping wheel control");
+            await ibricksBackgroundHandler.StopBackgroundActivityAsync(cello, DeviceStates.EventState, "WHEEL");
+            return;
+        }
         
         var channel = st.StartsWith("ClickRight") ? 1 : st.StartsWith("ClickLeft") ? 2 : -1;
         if (channel == -1)
@@ -64,6 +83,21 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
                 {
                     EventType = EventState.Press,
                     Channel = channel,
+                    CelloMacAddress = cello.Mac
+                });
+
+        await mqttPublisherService.PublishMessageAsync(state.GetMqttStateTopic(), JsonSerializer.Serialize(state),
+            false);
+    }
+    
+    private async Task HandleWheel(Model.Cello cello)
+    {
+        var state = await celloStoreService.AddOrUpdateStateAsync(cello, 1, cello.EventStates,
+            state => { state.EventType = EventState.Press; }, () =>
+                new EventState
+                {
+                    EventType = EventState.Wheel,
+                    Channel = 1,
                     CelloMacAddress = cello.Mac
                 });
 
