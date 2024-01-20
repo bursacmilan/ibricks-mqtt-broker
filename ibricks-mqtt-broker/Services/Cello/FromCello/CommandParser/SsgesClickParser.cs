@@ -93,7 +93,7 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
     private async Task HandleWheel(Model.Cello cello)
     {
         var state = await celloStoreService.AddOrUpdateStateAsync(cello, 1, cello.EventStates,
-            state => { state.EventType = EventState.Press; }, () =>
+            state => { state.EventType = EventState.Wheel; }, () =>
                 new EventState
                 {
                     EventType = EventState.Wheel,
