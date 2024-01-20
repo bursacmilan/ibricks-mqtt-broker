@@ -49,7 +49,7 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
         if (st.Equals("WheelClockwise;1", StringComparison.InvariantCultureIgnoreCase))
         {
             logger.LogDebug("Wheel clockwise starting");
-            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.EventState, "WHEEL", 350,
+            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.EventState, "WHEEL", 500,
                 async () =>
                 {
                     await HandleWheel(cello);
