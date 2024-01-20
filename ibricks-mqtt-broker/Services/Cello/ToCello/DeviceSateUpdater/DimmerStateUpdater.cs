@@ -12,7 +12,8 @@ public class DimmerStateUpdater(
     ILogger<DimmerStateUpdater> logger,
     IUdpSenderService udpSenderService,
     IIpMacService ipMacService,
-    ICelloStoreService celloStoreService) : IDeviceStateUpdater
+    ICelloStoreService celloStoreService,
+    IMqttPublisherService mqttPublisherService) : IDeviceStateUpdater
 {
     public async Task UpdateStateAsync(JsonNode deviceStateJson, bool isSingleValueJson, Model.Cello cello, int channel)
     {
@@ -33,7 +34,7 @@ public class DimmerStateUpdater(
         if (channel == DimmerState.GlobalDimmerChannel)
         {
             logger.LogDebug("This is a global dimmer. Only updating internally");
-            await celloStoreService.AddOrUpdateStateAsync(cello, channel, cello.DimmerStates, state =>
+            var state = await celloStoreService.AddOrUpdateStateAsync(cello, channel, cello.DimmerStates, state =>
             {
                 state.Value = dimmerState.Value;
                 state.IsOn = dimmerState.Value > 0;
@@ -45,6 +46,7 @@ public class DimmerStateUpdater(
                 Value = dimmerState.Value
             });
 
+            await mqttPublisherService.PublishMessageAsync(state.GetMqttStateTopic(), JsonSerializer.Serialize(state));
             return;
         }
 

@@ -49,10 +49,22 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
         if (st.Equals("WheelClockwise;1", StringComparison.InvariantCultureIgnoreCase))
         {
             logger.LogDebug("Wheel clockwise starting");
-            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.DimmerState, "WHEEL", 500,
+            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.DimmerState, "WHEEL", 100,
                 async () =>
                 {
-                    await HandleWheel(cello);
+                    await HandleWheel(cello, 2);
+                }, 10);
+
+            return;
+        } 
+        
+        if (st.Equals("WheelCounterclockwise;1", StringComparison.InvariantCultureIgnoreCase))
+        {
+            logger.LogDebug("Wheel counterclockwise starting");
+            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.DimmerState, "WHEEL", 100,
+                async () =>
+                {
+                    await HandleWheel(cello, -2);
                 }, 10);
 
             return;
@@ -90,11 +102,11 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
             false);
     }
     
-    private async Task HandleWheel(Model.Cello cello)
+    private async Task HandleWheel(Model.Cello cello, int increment)
     {
         var state = await celloStoreService.AddOrUpdateStateAsync(cello, 100, cello.DimmerStates, state =>
         {
-            state.Value += 5;
+            state.Value += increment;
             state.IsOn = state.Value > 0;
 
             if (state.Value > 100)

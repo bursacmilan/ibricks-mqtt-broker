@@ -15,7 +15,11 @@ public class IbricksBackgroundHandler(ILogger<IbricksBackgroundHandler> logger) 
         var id = GetId(cello, deviceState, identifier);
         
         var cancellationTokenSource = new CancellationTokenSource();
-        _cancellationTokens.AddOrUpdate(id, cancellationTokenSource, (_, _) => cancellationTokenSource);
+        _cancellationTokens.AddOrUpdate(id, cancellationTokenSource, (_, existingCancellationTokenSource) =>
+        {
+            existingCancellationTokenSource.Cancel();
+            return cancellationTokenSource;
+        });
 
         var round = 0;
         while (round < maxRounds && !cancellationTokenSource.Token.IsCancellationRequested)
