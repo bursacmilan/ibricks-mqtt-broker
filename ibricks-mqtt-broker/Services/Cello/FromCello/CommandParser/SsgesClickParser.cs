@@ -38,6 +38,14 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
             return;
         }
 
+        if (st.Equals("FullTouch;Click", StringComparison.InvariantCultureIgnoreCase))
+        {
+            logger.LogDebug("Full touch pressed. Handling all channels");
+            await HandleChannel(1, cello);
+            await HandleChannel(2, cello);
+            return;
+        }
+        
         var channel = st.StartsWith("ClickRight") ? 1 : st.StartsWith("ClickLeft") ? 2 : -1;
         if (channel == -1)
         {
@@ -45,6 +53,11 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
             return;
         }
 
+        await HandleChannel(channel, cello);
+    }
+
+    private async Task HandleChannel(int channel, Model.Cello cello)
+    {
         var state = await celloStoreService.AddOrUpdateStateAsync(cello, channel, cello.EventStates,
             state => { state.EventType = EventState.Press; }, () =>
                 new EventState
