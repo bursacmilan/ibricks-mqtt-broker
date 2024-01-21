@@ -35,4 +35,7 @@ public class Cello
     
     [Required]
     public Dictionary<int, EventState> EventStates { get; } = new();
+    
+    [Required]
+    public Dictionary<int, SensorState> SensorStates { get; } = new();
 }

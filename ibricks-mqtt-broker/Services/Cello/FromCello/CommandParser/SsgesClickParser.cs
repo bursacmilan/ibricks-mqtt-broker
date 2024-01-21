@@ -6,7 +6,11 @@ using Microsoft.Extensions.Logging;
 
 namespace ibricks_mqtt_broker.Services.Cello.FromCello.CommandParser;
 
-public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreService, IMqttPublisherService mqttPublisherService, IMqttSubscriberService mqttSubscriberService, IIbricksBackgroundHandler ibricksBackgroundHandler) : IIbricksCommandParser
+public class SsgesClickParser(
+    ILogger logger,
+    ICelloStoreService celloStoreService,
+    IMqttPublisherService mqttPublisherService,
+    IIbricksBackgroundHandler ibricksBackgroundHandler) : IIbricksCommandParser
 {
     public async Task ParseAsync(IbricksMessage message)
     {
@@ -16,7 +20,7 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
             logger.LogError("{ID}: SSGES no ST value found", message.MessageId);
             return;
         }
-        
+
         var cello = await celloStoreService.TryGetCelloAsync(message.AddressFrom);
         if (cello == null)
         {
@@ -49,23 +53,23 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
         if (st.Equals("WheelClockwise;1", StringComparison.InvariantCultureIgnoreCase))
         {
             logger.LogDebug("Wheel clockwise starting");
-            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.DimmerState, "WHEEL", 100,
-                async () =>
-                {
-                    await HandleWheel(cello, 2);
-                }, 10);
+
+            await HandleWheel(cello, SensorState.Clockwise);
+            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.SensorState, "WHEEL",
+                5000,
+                async () => { await HandleWheel(cello, SensorState.Idle); });
 
             return;
-        } 
-        
+        }
+
         if (st.Equals("WheelCounterclockwise;1", StringComparison.InvariantCultureIgnoreCase))
         {
             logger.LogDebug("Wheel counterclockwise starting");
-            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.DimmerState, "WHEEL", 100,
-                async () =>
-                {
-                    await HandleWheel(cello, -2);
-                }, 10);
+
+            await HandleWheel(cello, SensorState.Counterclockwise);
+            await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.SensorState, "WHEEL",
+                100,
+                async () => { await HandleWheel(cello, SensorState.Idle); });
 
             return;
         }
@@ -73,10 +77,11 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
         if (st.StartsWith("WheelStop", StringComparison.InvariantCultureIgnoreCase))
         {
             logger.LogDebug("Stopping wheel control");
-            await ibricksBackgroundHandler.StopBackgroundActivityAsync(cello, DeviceStates.DimmerState, "WHEEL");
+            await ibricksBackgroundHandler.StopBackgroundActivityAsync(cello, DeviceStates.SensorState, "WHEEL");
+            await HandleWheel(cello, SensorState.Idle);
             return;
         }
-        
+
         var channel = st.StartsWith("ClickRight") ? 1 : st.StartsWith("ClickLeft") ? 2 : -1;
         if (channel == -1)
         {
@@ -101,28 +106,17 @@ public class SsgesClickParser(ILogger logger, ICelloStoreService celloStoreServi
         await mqttPublisherService.PublishMessageAsync(state.GetMqttStateTopic(), JsonSerializer.Serialize(state),
             false);
     }
-    
-    private async Task HandleWheel(Model.Cello cello, int increment)
+
+    private async Task HandleWheel(Model.Cello cello, string sensorState)
     {
-        var state = await celloStoreService.AddOrUpdateStateAsync(cello, 100, cello.DimmerStates, state =>
-        {
-            state.Value += increment;
-            state.IsOn = state.Value > 0;
+        var state = await celloStoreService.AddOrUpdateStateAsync(cello, 100, cello.SensorStates,
+            state => { state.State = sensorState; }, () => new SensorState
+            {
+                State = sensorState,
+                Channel = 100,
+                CelloMacAddress = cello.Mac
+            });
 
-            if (state.Value > 100)
-                state.Value = 100;
-
-            if (state.Value < 0)
-                state.Value = 0;
-        }, () => new DimmerState
-        {
-            Value = 50,
-            IsOn =  true,
-            Channel = 100,
-            CelloMacAddress = cello.Mac
-        });
-
-        await mqttPublisherService.PublishMessageAsync(state.GetMqttStateTopic(), JsonSerializer.Serialize(state));
-        await mqttSubscriberService.SubscribeToTopicAsync(state.GetMqttCommandTopic());
+        await mqttPublisherService.PublishMessageAsync(state.GetMqttStateTopic(), sensorState);
     }
 }

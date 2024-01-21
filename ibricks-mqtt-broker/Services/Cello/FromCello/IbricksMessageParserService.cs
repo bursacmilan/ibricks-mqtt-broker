@@ -12,7 +12,7 @@ public class IbricksMessageParserService(
     IMqttSubscriberService mqttSubscriberService,
     IIpMacService ipMacService,
     IUdpSenderService udpSenderService,
-    IIbricksBackgroundHandler backgroundHandler) : IIbricksMessageParserService
+    IIbricksBackgroundHandler ibricksBackgroundHandler) : IIbricksMessageParserService
 {
     public async Task ParseMessageAsync(IbricksMessage message)
     {
@@ -36,7 +36,7 @@ public class IbricksMessageParserService(
             nameof(IbricksMessageCommands.ASCHG) => new AschgCoverParser(logger, celloStoreService,
                 mqttPublisherService, mqttSubscriberService),
             nameof(IbricksMessageCommands.SSGES) => new SsgesClickParser(logger, celloStoreService,
-                mqttPublisherService, mqttSubscriberService, backgroundHandler),
+                mqttPublisherService, ibricksBackgroundHandler),
             _ => null
         };
 

@@ -9,8 +9,8 @@ public class IbricksBackgroundHandler(ILogger<IbricksBackgroundHandler> logger) 
 {
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _cancellationTokens = new();
     
-    public async Task RegisterBackgroundActivityAsync(Model.Cello cello, DeviceStates deviceState, string identifier, int delayInMs,
-        Func<Task> action, int maxRounds)
+    public async Task RegisterBackgroundActivityAsync(Model.Cello cello, DeviceStates deviceState, string identifier, int waitInMs,
+        Func<Task> afterTimeExpires)
     {
         var id = GetId(cello, deviceState, identifier);
         
@@ -21,13 +21,8 @@ public class IbricksBackgroundHandler(ILogger<IbricksBackgroundHandler> logger) 
             return cancellationTokenSource;
         });
 
-        var round = 0;
-        while (round < maxRounds && !cancellationTokenSource.Token.IsCancellationRequested)
-        {
-            await action();
-            await Task.Delay(delayInMs, cancellationTokenSource.Token);
-            round++;
-        }
+        await Task.Delay(waitInMs, cancellationTokenSource.Token);
+        await afterTimeExpires();
 
         _cancellationTokens.Remove(id, out _);
     }

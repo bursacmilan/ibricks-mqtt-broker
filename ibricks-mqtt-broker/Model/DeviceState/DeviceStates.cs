@@ -10,6 +10,7 @@ public sealed class DeviceStates : SmartEnum<DeviceStates>
     public static readonly DeviceStates ClimateState = new(nameof(ClimateState), 3);
     public static readonly DeviceStates CoverState = new(nameof(CoverState), 4);
     public static readonly DeviceStates EventState = new(nameof(EventState), 5);
+    public static readonly DeviceStates SensorState = new(nameof(SensorState), 6);
 
     private DeviceStates(string name, int value) : base(name, value)
     {

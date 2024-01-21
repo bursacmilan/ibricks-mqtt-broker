@@ -11,9 +11,7 @@ namespace ibricks_mqtt_broker.Services.Cello.ToCello.DeviceSateUpdater;
 public class DimmerStateUpdater(
     ILogger<DimmerStateUpdater> logger,
     IUdpSenderService udpSenderService,
-    IIpMacService ipMacService,
-    ICelloStoreService celloStoreService,
-    IMqttPublisherService mqttPublisherService) : IDeviceStateUpdater
+    IIpMacService ipMacService) : IDeviceStateUpdater
 {
     public async Task UpdateStateAsync(JsonNode deviceStateJson, bool isSingleValueJson, Model.Cello cello, int channel)
     {
@@ -28,25 +26,6 @@ public class DimmerStateUpdater(
         if (dimmerState == null)
         {
             logger.LogError("Could not parse JSON {Json} to dimmerState", deviceStateJson.ToJsonString());
-            return;
-        }
-
-        if (channel == DimmerState.GlobalDimmerChannel)
-        {
-            logger.LogDebug("This is a global dimmer. Only updating internally");
-            var state = await celloStoreService.AddOrUpdateStateAsync(cello, channel, cello.DimmerStates, state =>
-            {
-                state.Value = dimmerState.Value;
-                state.IsOn = dimmerState.Value > 0;
-            }, () => new DimmerState
-            {
-                CelloMacAddress = cello.Mac,
-                Channel = channel,
-                IsOn = dimmerState.Value > 0,
-                Value = dimmerState.Value
-            });
-
-            await mqttPublisherService.PublishMessageAsync(state.GetMqttStateTopic(), JsonSerializer.Serialize(state));
             return;
         }
 

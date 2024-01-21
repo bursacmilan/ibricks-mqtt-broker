@@ -28,11 +28,13 @@
       <EmbeddedResource Include="Model\DeviceState\Json\Meteo.json" />
       <EmbeddedResource Include="Model\DeviceState\Json\Relay.json" />
       <EmbeddedResource Include="Model\DeviceState\Json\Event.json" />
+      <EmbeddedResource Include="Model\DeviceState\Json\Sensor.json" />
       <None Remove="Model\DeviceState\Yaml\Cover.yaml" />
       <None Remove="Model\DeviceState\Yaml\Dimmer.yaml" />
       <None Remove="Model\DeviceState\Yaml\Meteo.yaml" />
       <None Remove="Model\DeviceState\Yaml\Relay.yaml" />
       <None Remove="Model\DeviceState\Json\Button.json" />
+      <None Remove="Model\DeviceState\Json\Sensor.json" />
     </ItemGroup>
 
 </Project>

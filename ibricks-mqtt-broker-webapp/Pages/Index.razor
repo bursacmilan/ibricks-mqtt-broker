@@ -61,6 +61,11 @@
                 {
                     <DeviceStates Title="Event" Cello="cello" AllDeviceStates="cello.EventStates"></DeviceStates>
                 }
+                
+                @if (cello.SensorStates.Count > 0)
+                {
+                    <DeviceStates Title="Sensor" Cello="cello" AllDeviceStates="cello.SensorStates"></DeviceStates>
+                }
             </MudExpansionPanels>
         </MudCardContent>
     </MudCard>

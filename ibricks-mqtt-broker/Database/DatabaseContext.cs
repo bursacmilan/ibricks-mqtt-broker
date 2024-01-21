@@ -85,6 +85,13 @@ public class DatabaseContext : DbContext
                      new Dictionary<int, EventState>());
         
         modelBuilder.Entity<Cello>()
+            .Property(b => b.SensorStates)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                v => JsonSerializer.Deserialize<Dictionary<int, SensorState>>(v, JsonSerializerOptions.Default) ??
+                     new Dictionary<int, SensorState>());
+        
+        modelBuilder.Entity<Cello>()
             .Property(b => b.HardwareInfo)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
