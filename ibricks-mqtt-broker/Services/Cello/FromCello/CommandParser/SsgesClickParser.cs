@@ -56,19 +56,19 @@ public class SsgesClickParser(
 
             await HandleWheel(cello, SensorState.Clockwise);
             await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.SensorState, "WHEEL",
-                5000,
+                10000,
                 async () => { await HandleWheel(cello, SensorState.Idle); });
 
             return;
         }
 
-        if (st.Equals("WheelCounterclockwise;1", StringComparison.InvariantCultureIgnoreCase))
+        if (st.Equals("WheelAntiClockwise;1", StringComparison.InvariantCultureIgnoreCase))
         {
             logger.LogDebug("Wheel counterclockwise starting");
 
             await HandleWheel(cello, SensorState.Counterclockwise);
             await ibricksBackgroundHandler.RegisterBackgroundActivityAsync(cello, DeviceStates.SensorState, "WHEEL",
-                100,
+                10000,
                 async () => { await HandleWheel(cello, SensorState.Idle); });
 
             return;
