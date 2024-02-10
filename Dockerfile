@@ -1,6 +1,11 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+
 WORKDIR /app
 COPY . .
-EXPOSE 5000
+RUN chmod 777 ./run.sh
 
-ENTRYPOINT dotnet "./ibricks-mqtt-broker-webapp.dll" --urls "http://+:5000"
+RUN apt-get update
+RUN apt-get install jq -y
+
+EXPOSE 5000
+ENTRYPOINT ["./run.sh"]
