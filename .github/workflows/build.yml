@@ -19,8 +19,9 @@ jobs:
       packages: write
       contents: read
     env:
-      IMAGE_NAME: ghcr.io/bursacmilan/ibricks-mqtt-broker:latest
+      IMAGE_NAME: ghcr.io/bursacmilan/ibricks-mqtt-broker
       DOCKER_TARGET_PLATFORM: linux/arm64
+      DOCKER_IMAGE_TAG: ${{ inputs.version }}
 
     steps:
     - name: Checkout Repository
@@ -47,9 +48,21 @@ jobs:
       run: mv Dockerfile publishedOutput/Dockerfile
 
     - name: Build docker image
+      shell: pwsh
+      run: |
+        version = "${{ env.DOCKER_IMAGE_TAG}}"
+        if [ -z "$version" ]; then
+            version = "latest"
+        fi
+
+        cd publishedOutput
+        docker build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag ${{ env.IMAGE_NAME }}:$version
+
+    - name: Build docker image
+      if: ${{ env.DOCKER_IMAGE_TAG !== '' && env.DOCKER_IMAGE_TAG !== undefined }}
       run: |
         cd publishedOutput
-        docker build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag ${{ env.IMAGE_NAME }}
+        docker build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag "${{ env.IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG}}"
 
     - name: Log in to registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
