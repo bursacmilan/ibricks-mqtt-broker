@@ -47,6 +47,9 @@ jobs:
     - name: Move docker file
       run: mv Dockerfile publishedOutput/Dockerfile
 
+    - name: Move run script
+      run: mv run.sh publishedOutput/run.sh
+
     - name: Build docker image
       shell: pwsh
       run: |
