@@ -1,6 +1,12 @@
 name: .NET Build
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Image version'
+        required: false
+        default: 'latest'
   push:
     branches:
       - main
