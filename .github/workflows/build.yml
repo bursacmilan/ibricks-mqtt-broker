@@ -48,15 +48,16 @@ jobs:
       run: mv Dockerfile publishedOutput/Dockerfile
 
     - name: Build docker image
-      shell: bash
+      shell: pwsh
       run: |
-        version = "${{ env.DOCKER_IMAGE_TAG}}"
-        if [ -z "$version" ]; then
-            version = "latest"
-        fi
-
+        $version = "${{ env.DOCKER_IMAGE_TAG}}";
+        if($version -eq "") {
+            $version = "latest"
+        }
+        
+        Write-Host $version
         cd publishedOutput
-        docker build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag ${{ env.IMAGE_NAME }}:$version
+        docker build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag "${{ env.IMAGE_NAME }}:$version"
         
     - name: Log in to registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
