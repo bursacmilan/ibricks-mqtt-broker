@@ -20,7 +20,7 @@ jobs:
       contents: read
     env:
       IMAGE_NAME: ghcr.io/bursacmilan/ibricks-mqtt-broker
-      DOCKER_TARGET_PLATFORM: linux/armv64
+      DOCKER_TARGET_PLATFORM: linux/arm64
       DOCKER_IMAGE_TAG: ${{ inputs.version }}
 
     steps:
