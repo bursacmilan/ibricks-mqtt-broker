@@ -8,4 +8,4 @@ RUN apt-get update
 RUN apt-get install jq -y
 
 EXPOSE 5000
-ENTRYPOINT ["run.sh"]
+ENTRYPOINT ["./run.sh"]
