@@ -48,7 +48,7 @@ jobs:
       run: mv Dockerfile publishedOutput/Dockerfile
 
     - name: Build docker image
-      shell: pwsh
+      shell: bash
       run: |
         version = "${{ env.DOCKER_IMAGE_TAG}}"
         if [ -z "$version" ]; then
