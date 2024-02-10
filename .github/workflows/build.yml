@@ -57,13 +57,7 @@ jobs:
 
         cd publishedOutput
         docker build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag ${{ env.IMAGE_NAME }}:$version
-
-    - name: Build docker image
-      if: ${{ env.DOCKER_IMAGE_TAG !== '' && env.DOCKER_IMAGE_TAG !== undefined }}
-      run: |
-        cd publishedOutput
-        docker build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag "${{ env.IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG}}"
-
+        
     - name: Log in to registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
