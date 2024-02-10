@@ -8,4 +8,5 @@ mac=$(jq -r '.mac' /data/options.json)
 
 echo "test ${ip}"
 
-dotnet /app/ibricks-mqtt-webapp.dll
+export Logging__LogLevel__ibricks_mqtt_broker="$ip"
+dotnet /app/ibricks-mqtt-broker-webapp.dll
