@@ -63,4 +63,12 @@ jobs:
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
     - name: Push image
-      run: docker push ${{ env.IMAGE_NAME }}
+      run: |
+        $version = "${{ env.DOCKER_IMAGE_TAG}}";
+        if($version -eq "") {
+            $version = "latest"
+        }
+        
+        Write-Host $version
+        docker push "${{ env.IMAGE_NAME }}:$version"
+      shell: pwsh
