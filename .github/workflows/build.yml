@@ -60,7 +60,7 @@ jobs:
         
         Write-Host $version
         cd publishedOutput
-        docker build . --tag "${{ env.IMAGE_NAME }}:$version"
+        docker buildx build . --platform ${{ env.DOCKER_TARGET_PLATFORM }} --tag "${{ env.IMAGE_NAME }}:$version"
         
     - name: Log in to registry
       run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
